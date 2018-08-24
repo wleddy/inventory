@@ -1,0 +1,52 @@
+## Site Settings
+
+## Changes to this settings file only take effect after restarting the server ###
+
+## ALL CONFIG NAMES MUST BE UPPERCASE!  ##
+
+# The basics...
+#SERVER_NAME = "example.com" # this has to be a real host name
+HOST_NAME = 'localhost:5000' # this should usually be SERVER_NAME
+SITE_NAME = "My New Web Site"
+DEBUG = True
+REQUIRE_SSL = (not DEBUG)
+
+HOST_PROTOCOL = "http"
+if REQUIRE_SSL:
+    HOST_PROTOCOL = "https"
+
+CGI_ROOT_FIX_APPLY = False # Some webservers mess up the root url
+CGI_ROOT_FIX_PATH = "/" #this is usually correct path
+
+SECRET_KEY = "somereallylongstringtouseasakey"
+
+# set session expiration in seconds
+PERMANENT_SESSION_LIFETIME = 60*20
+
+# You can change database to another name if you like.
+DATABASE_NAME= "database.sqlite"
+DATABASE_PATH= 'instance/' + DATABASE_NAME
+
+## Email Sending...
+#MAIL_SERVER = 'localhost'
+#MAIL_PORT = 25 # or 465
+#MAIL_USE_SSL = False
+#MAIL_USERNAME = ""
+#MAIL_PASSWORD = ""
+#MAIL_DEFAULT_SENDER = ""
+#MAIL_DEFAULT_EMAIL = MAIL_USERNAME
+
+# Uploads ...
+MAX_CONTENT_LENGTH = 300000
+
+## some administrative settings
+ALLOW_USERNAME_CHANGE = True
+
+#Map Box Settings...
+#MAPBOX_PROJECT_ID = ""
+#MAPBOX_ACCESS_TOKEN = ""
+
+# Sets the default location when creating a new location pin if geolocation is not available
+#LOCATION_DEFAULT_LNG = -121.74439430236818
+#LOCATION_DEFAULT_LAT = 38.54422161206573
+

@@ -1,0 +1,10 @@
+{% extends "layout.html" %}
+{% block title %}{{g.title}}{% endblock %}
+{% block body %}
+{% if rendered_html%}
+{{ rendered_html | safe()}}
+{% else %}
+    <h2>No Info available</h2>
+    <p>How About that?</p>
+{% endif %}
+{% endblock body%}

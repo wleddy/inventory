@@ -1,0 +1,10 @@
+#!/bin/bash
+
+
+if [ -f "instance/activate_env" ] 
+then
+. instance/activate_env
+else
+echo 'activating env'
+. env/bin/activate
+fi

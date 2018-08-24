@@ -1,0 +1,30 @@
+{% extends "layout.html" %}
+{% block title %}{{g.title}}{% endblock %}
+{% block body %}
+
+<h2>Contact Us</h2>
+{% if rendered_html %}
+{{ rendered_html | safe()}}
+{% endif %}
+
+{% if show_form %}
+<p>Please fill out the form below if you have something to say on the subject.</p>
+
+<form action="{{ g.contactURL }}" method="post" accept-charset="utf-8">
+    <fieldset>
+        <p><span>Name</span><input type="text" size="50" name="name" required value="{{ context['name']}}" id="name" /></p>
+        <p><span>Email Address</span><input type="text" size="50" required name="email" value="{{ context['email']}}" id="email" /></p>
+        <p><span>Question, Comment, Condemnation:</span></p>
+        <textarea name="comment" rows="8" cols="40" required >{{ context['comment'] }}</textarea>        
+    </fieldset>
+
+    <p><input type="submit" value="Send">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="/">Cancel</a></p>
+</form>
+{% else %}
+<p>Thanks for your comments. We'll get back to you soon.</p>
+
+<p><a href="/">Return to the home page</a></p>
+
+{% endif %}
+
+{% endblock body%}

@@ -1,0 +1,11 @@
+{% extends "layout.html" %}
+{% block title %}{{ g.title }}{% endblock %}
+{% block body %}
+
+
+{% if rendered_html %}
+{{ rendered_html | safe() }}
+{% endif %}
+
+
+{% endblock body %}
