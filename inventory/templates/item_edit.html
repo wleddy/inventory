@@ -1,0 +1,30 @@
+{% extends "layout.html" %}
+{% block title %}Edit {{ g.title }}{% endblock %}
+{% block body %}
+	<h2>Edit {{ g.title }}</h2>	
+    <form action="{{ g.editURL }}{{ rec.id|default('0',True)}}/" method=post class="entry">
+		{% include "editFormButtons.html" %}
+        <fieldset>
+    		<input type=hidden name="id" value="{{rec.id|default('0',True )}}">
+            <p><span>Name:</span><input type="text" size="30" name="name" required value="{{ rec.name|default('',True )}}" /></p>
+            <p><span>Description: </span><input type="text" size="30" name="description" value="{{ rec.description|default('',True )}}" /></p>
+            <p><span>Minimum Stock: </span><input type="number" name="min_stock"  value="{{ rec.mn_stock|default('3',True)}}" /></p>
+            <p><span>Unit of Measure: </span>
+                <select  name="uom" >
+                    <option value="" ><em>None</em></option>
+                    {% for uom in uoms %}
+                    <option value="{{ uom.name }}" {% if rec.uom == uom.name %}selected{% endif %} >{{ uom.name}}</option>
+                    {% endfor %}
+                </select>
+            </p>
+            <p><span>Category: </span>
+                <select  name="cat_id" >
+                    <option value="0" ><em>None</em></option>
+                    {% for category in categories %}
+                    <option value="{{ category.id }}" {% if rec.cat_id == category.id %}selected{% endif %} >{{ category.name}}</option>
+                    {% endfor %}
+                </select>
+            </p>
+        </fieldset>
+    </form>
+{% endblock body %}

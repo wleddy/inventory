@@ -5,6 +5,8 @@ from users.database import Database
 from users.models import User,Role,init_db, Pref
 from users.admin import Admin
 
+from inventory.models import init_tables, Item, Uom, Transaction, Category
+
 # Create app
 app = Flask(__name__, instance_relative_config=True)
 app.config.from_pyfile('site_settings.py', silent=True)
@@ -52,6 +54,10 @@ def _before():
         g.admin.register(Role,url_for('role.display'),display_name='Roles',minimum_rank_required=1000)
         g.admin.register(Pref,url_for('pref.display'),display_name='Prefs',minimum_rank_required=1000)
         
+        g.admin.register(Item,None,display_name='Inv Admin',header_row=True,minimum_rank_required=500)
+        g.admin.register(Item,url_for('item.display'),minimum_rank_required=500)
+        g.admin.register(Category,url_for('category.display'),display_name='Categories',minimum_rank_required=500)
+        g.admin.register(Uom,url_for('uom.display'),display_name='UOM',minimum_rank_required=500)
 
 
 @app.teardown_request
@@ -70,9 +76,16 @@ app.register_blueprint(login.mod)
 app.register_blueprint(role.mod)
 app.register_blueprint(pref.mod)
 
+from inventory.views import item, category, uom
+app.register_blueprint(item.mod)
+app.register_blueprint(category.mod)
+app.register_blueprint(uom.mod)
+
+
 if __name__ == '__main__':
     with app.app_context():
         init_db(get_db())
+        init_tables(get_db())
         get_db().close()
         
     #app.run(host='172.20.10.2', port=5000)
