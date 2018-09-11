@@ -231,11 +231,18 @@ p.flash {
     border-bottom:.5pt solid #888;
 }
 #profile-menu {
-    float:right;
+    position:absolute;
+    top:120pt;
+    right:28pt;
 }
-
+#profile-header {
+    position:relative;
+    background-image:url('/static/images/profile_image.png');
+    background-repeat:no-repeat;
+    padding: 10px 6px 6pt 36pt;
+}
 .menu-item {
-    float:left;
+    display:inline-block;
     position:relative;
     margin:0;
     padding:6pt 8pt 6pt 8pt;
@@ -273,7 +280,7 @@ p.flash {
     min-width:120pt;
 }
 .dropdown p {
-    padding: 10px 6px 6pt 36pt;
+    padding: 10px 6px 6px 10px;
     margin:0;
 }
 .dropdown:hover {
@@ -281,8 +288,6 @@ p.flash {
 }
 .dd-menu-header {
     font-weight:800;
-    background-image:url('/static/images/profile_image.png');
-    background-repeat:no-repeat;
 }
 .dd-menu-header a {
     text-decoration:none;

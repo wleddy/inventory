@@ -8,13 +8,13 @@
 		<tr>
 			<th>Name</th>
             <th>Category</th>
-			<th>Description</th>
+			<th>On Hand</th>
 		</tr>
 		{% for rec in recs %}
 	    <tr>
 			<td style="min-width:100px;"><a href="{{ g.editURL }}{{ rec.id }}/">{{ rec.name }}</a></td>
-			<td style="min-width:80px;">{{ cats[rec.id]|default("- None -",true) }}</td>
-			<td style="min-width:200px;">{{ rec.description|default("",true) }}</td>
+			<td style="min-width:80px;">{{ rec.cat_id | category_name |default("- None -",true) }}</td>
+			<td style="min-width:20px;text-align:right;">{{ rec.id | stock_on_hand |default("0",true) }}</td>
 		</tr>
 		{% endfor %}
 	  </table>

@@ -21,16 +21,7 @@ def display():
     
     recs = Item(g.db).select()
     
-    #Get categories to display
-    categories = Category(g.db)
-    cats = {}
-    if recs:
-        for rec in recs:
-            cat = categories.get(rec.cat_id)
-            cats[rec.id] = cat.name
-        
-
-    return render_template('item_list.html',recs=recs,cats=cats)
+    return render_template('item_list.html',recs=recs)
     
     
 @mod.route('/edit',methods=["GET", "POST",])
@@ -41,9 +32,12 @@ def edit(id=None):
     setExits()
     
     item = Item(g.db)
-    
+    #item.use_slots=False
+    trxs = None
+    #import pdb;pdb.set_trace()
     if request.form:
         id = request.form.get('id',None)
+    
     id = cleanRecordID(id)
     
     if id < 0:
@@ -55,7 +49,11 @@ def edit(id=None):
     
     if id >= 0 and not request.form:
         if id == 0:
-            rec = item.new()
+            rec = item.new() # allow creation of new properties
+            item.save(rec) # need an id for transactions
+            g.db.commit() # have to commit this to protect the ID we just got
+            g.cancelURL = url_for('.cancel') + "{}/".format(rec.id)
+            
         else:
             rec = item.get(id)
             
@@ -63,6 +61,10 @@ def edit(id=None):
             flash('Record not Found')
             return redirect(g.listURL)
             
+    #import pdb;pdb.set_trace()
+    on_hand = item.stock_on_hand(id)
+    trxs = Transaction(g.db).select(where='item_id = {}'.format(id))
+                
     if request.form:
         if not validate_form():
             rec = request.form
@@ -86,8 +88,25 @@ def edit(id=None):
             flash('Record not Found')
             return redirect(g.listURL)
         
-    return render_template('item_edit.html',rec=rec,categories=categories,uoms=uoms)
+    return render_template('item_edit.html',rec=rec,categories=categories,uoms=uoms,trxs=trxs,on_hand=on_hand)
 
+@mod.route('/cancel',methods=["GET", "POST",])
+@mod.route('/cancel/',methods=["GET", "POST",])
+@mod.route('/cancel/<int:id>/',methods=["GET", "POST",])
+@table_access_required(Item)
+def cancel(id=None):
+    """If user canceled a new record come here to delete the record stub"""
+    setExits()
+    
+    if id:
+        try:
+            Item(g.db).delete(id)
+            g.db.commit()
+        except:
+            flash("Could not delete temporary Item with id = {}".format(id))
+        
+        
+    return redirect(g.listURL)
 
     
 @mod.route('/delete',methods=["GET", "POST",])

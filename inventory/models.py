@@ -9,7 +9,7 @@ class Item(SqliteTable):
         super().__init__(db_connection)
         self.table_name = 'item'
         self.order_by_col = 'name'
-        self.defaults = {'uom':"Each",}
+        self.defaults = {'uom':"Ea.","min_stock":3}
         
     def create_table(self):
         """Define and create the table"""
@@ -17,12 +17,20 @@ class Item(SqliteTable):
         sql = """
             name TEXT,
             description TEXT,
-            min_stock NUMBER,
+            min_stock NUMBER DEFAULT 3,
             uom TEXT,
             cat_id INT
             """
         super().create_table(sql)
 
+    def stock_on_hand(self,id):
+        on_hand = 0
+        if id and id > 0:
+            trxs = Transaction(self.db).select(where='item_id = {}'.format(id))
+            if trxs:
+                for trx in trxs:
+                    on_hand += trx.qty
+        return on_hand
 
 class Category(SqliteTable):
     """
@@ -50,8 +58,8 @@ class Transaction(SqliteTable):
 
     def __init__(self,db_connection):
         super().__init__(db_connection)
-        self.table_name = 'transaction'
-        self.order_by_col = 'created'
+        self.table_name = 'trx'
+        self.order_by_col = 'created desc'
         self.defaults = {}
 
     def create_table(self):
@@ -90,22 +98,11 @@ class Uom(SqliteTable):
     def init_table(self):
         """Create the table and initialize data"""
         self.create_table()
-    
-        #Try to get a value from the table and create records if none
-        rec = self.db.execute('select * from {}'.format(self.table_name)).fetchone()
-        if not rec:
-            units = [
-                ('Each',),
-                ('Foot',),
-                ('Meter',),
-                ('Pair',),
-            ]
-            self.db.executemany("insert into {} values (null, ?)".format(self.table_name),units)
-            self.db.commit()
-        
+            
 
 def init_tables(db):
     Item(db).init_table()
     Category(db).init_table()
     Item(db).init_table()
     Uom(db).init_table()
+    Transaction(db).init_table()

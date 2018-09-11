@@ -1,0 +1,28 @@
+{% extends "layout.html" %}
+{% block title %}{{ g.title }} List{% endblock %}
+{% block body %}
+	<h2>{{g.title}} List</h2>
+      	<p id="addRecord"><a href="{{ g.editURL }}0/">Add a new {{ g.title }}</a></p>
+	{%if recs %}
+		<table class="datatable">
+		<tr>
+            <th>Item</th>
+			<th>Date</th>
+            <th>Qty</th>
+            <th>Value</th>
+			<th>Note</th>
+		</tr>
+		{% for rec in recs %}
+	    <tr>
+			<td style="min-width:80px;"><a href="{{ g.editURL }}{{ rec.id }}/">{{ item[rec.item_id]|default("None",true) }}</a></td>
+			<td style="min-width:100px;">{{ rec.created|default('None') | date_string }}</td>
+			<td style="min-width:80px;text-align:right;">{{ rec.qty|default("0",true) }}</td>
+			<td style="min-width:80px;text-align:right;">{{ rec.value|default("0.00",true)|money() }}</td>
+			<td style="min-width:200px;">{{ rec.note|default("",true) }}</td>
+		</tr>
+		{% endfor %}
+	  </table>
+  	{% else %}
+    	<p><em>No {{ g.title }}s here so far</em></p>
+	{% endif %}
+{% endblock %}

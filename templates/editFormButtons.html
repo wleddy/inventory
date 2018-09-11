@@ -1,7 +1,7 @@
 <p class="form_button_row" >
 	<input type=submit value=Save />&nbsp;&nbsp;
-	{% if rec.id and rec.id > 0 and (not no_delete or is_admin) %}
+	{% if rec.id and rec.id > 0 and (not no_delete or is_admin) and not g.cancelURL %}
 	<a id="form_delete_link" href = "{{g.deleteURL}}{{rec.id}}/" onclick="return confirmRecordDelete();">Delete...</a>&nbsp;&nbsp;
 	{% endif %}
-	<a href="{{ g.listURL }}" >Cancel</a>
+    <a href="{% if g.cancelURL %}{{g.cancelURL}}{% else %}{{ g.listURL }}{% endif %}" >Cancel</a>
 </p> 

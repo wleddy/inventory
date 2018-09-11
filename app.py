@@ -1,11 +1,13 @@
 from flask import Flask, render_template, g, session, url_for, request, redirect
 from flask_mail import Mail
+from datetime import datetime
 
 from users.database import Database
 from users.models import User,Role,init_db, Pref
 from users.admin import Admin
 
 from inventory.models import init_tables, Item, Uom, Transaction, Category
+from inventory.utils import str_to_short_date
 
 # Create app
 app = Flask(__name__, instance_relative_config=True)
@@ -28,7 +30,10 @@ def get_db(filespec=app.config['DATABASE_PATH']):
         g.db = Database(filespec).connect()
     return g.db
 
+from inventory.utils import register_jinja_filters
+register_jinja_filters(app)
 
+        
 @app.before_request
 def _before():
     # Force all connections to be secure
@@ -58,6 +63,7 @@ def _before():
         g.admin.register(Item,url_for('item.display'),minimum_rank_required=500)
         g.admin.register(Category,url_for('category.display'),display_name='Categories',minimum_rank_required=500)
         g.admin.register(Uom,url_for('uom.display'),display_name='UOM',minimum_rank_required=500)
+        g.admin.register(Transaction,url_for('transaction.display'),display_name='Transactions',minimum_rank_required=500)
 
 
 @app.teardown_request
@@ -76,10 +82,11 @@ app.register_blueprint(login.mod)
 app.register_blueprint(role.mod)
 app.register_blueprint(pref.mod)
 
-from inventory.views import item, category, uom
+from inventory.views import item, category, uom, transaction
 app.register_blueprint(item.mod)
 app.register_blueprint(category.mod)
 app.register_blueprint(uom.mod)
+app.register_blueprint(transaction.mod)
 
 
 if __name__ == '__main__':

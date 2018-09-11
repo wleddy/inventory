@@ -1,0 +1,46 @@
+<div id="nav">
+    {% if g.user %}
+    {% endif %}
+        <p id="mobile-menu-header" class="menu-item dropdown" onclick="" >Menu</p>
+        <div id="mobile-menu-contain">
+            <div>
+                <p class="menu-item" ><a href="/">Home</a></p>
+                <p class="menu-item" ><a href="{{ url_for('item.display')}}">Inventory Items</a></p>
+                <p class="menu-item" ><a href="{{ url_for('transaction.display')}}">Transactions</a></p>
+                <div onclick="" class="dropdown">
+                    <p class="dd-menu-header" style="border-right:solid #ccc 1pt;min-width:160pt">Reports</p>
+                    <div class="dropdown-content">
+                        <ul>
+                            <li style="min-width:160pt;"><a href="{{ url_for('item.display')}}">Item List</a></li>
+                            <li style="min-width:160pt;"><a href="{{ url_for('transaction.display')}}" >Transaction Report</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div onclick="" id="profile-menu" class="dropdown">
+                <p id="profile-header" class="dd-menu-header">
+                    {% if g.user %}My Profile{% else %}<a href="{{ url_for('login.login')}}" >Login</a>{% endif %}
+                </p>
+                <div class="dropdown-content">
+                    <ul>
+                        {% if g.user %}
+                        <li><a href="{{ url_for('user.edit')}}" >Manage Profile</a></li>
+                        <li><a href="{{ url_for('login.logout')}}">Logout</a></li>
+                            {% if g.admin and g.admin.has_access(g.user)%}
+                                {% for item in g.admin.permissions %}
+                                    {% if g.admin.has_access(g.user,item['table'])%}
+                                        {% if item['header_row'] == True %}
+                                        <p class="dd-menu-divider">{{item['display_name']}}</p>
+                                        {% else %}
+                                        <li><a href="{{item['url']}}">{{item['display_name']}}</a></li>
+                                        {% endif %}
+                                    {% endif %}
+                                {% endfor %}
+                            {% endif %}
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <p class="clear"></p>
+</div>

@@ -1,0 +1,29 @@
+{% extends "layout.html" %}
+{% block title %}Edit {{ g.title }}{% endblock %}
+{% block body %}
+	<h2>Edit {{ g.title }}</h2>	
+    <form action="{{ g.editURL }}{{ rec.id|default('0',True)}}/" method=post class="entry">
+		{% include "editFormButtons.html" %}
+        <fieldset>
+    		<input type=hidden name="id" value="{{rec.id|default('0',True )}}">
+            {% if items and not current_item %}
+            <select name="item_id">
+                <option value="0"><em>Select one</em></option>
+                {% for item in items %}
+                <option value="{{item.id}}">{{ item.name}}</option>
+                {% endfor %}
+            </select>
+            {% else %}
+        		<input type=hidden name="item_id" value="{{rec.item_id|default('0',True )}}">
+                <h3>{{current_item.name}}</h3>
+            {% endif %}
+            <p><span>Qty:</span><input type="num" size="5" name="qty" required value="{{ rec.qty|default('',True )}}" />&nbsp;&nbsp;(+ to add, - to remove)</p>
+            <p><span>Value:</span>
+                <input type="num" size="5" name="value" value="{{ rec.value|default('0',True )|money}}" />
+                {%if current_item.uom %}(per {{ current_item.uom }}){% endif %}
+            </p>
+            <p><span>Date: </span><input type="date" size="20" required name="created" value="{{ rec.created|default('',True )|date_string}}" /></p>
+            <p><span>Note: </span><input type="text" size="40" name="note"  value="{{ rec.note|default('',True)}}" /></p>
+        </fieldset>
+    </form>
+{% endblock body %}
