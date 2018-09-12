@@ -1,4 +1,5 @@
 from users.database import Database, SqliteTable
+from users.utils import cleanRecordID
 
 class Item(SqliteTable):
     """
@@ -23,14 +24,34 @@ class Item(SqliteTable):
             """
         super().create_table(sql)
 
+    def _select_sql(self,**kwargs):
+        """Return the sql text that will be used by select or select_one
+        optional kwargs are:
+            where: text to use in the where clause
+            order_by: text to include in the order by clause
+        
+            This version deals with the category.name, item.name sorting that I 
+            want to do most of the time
+            
+            provide a where or order_by kwarg to use standard method instead
+            
+        """
+        where = kwargs.get('where',None)
+        order_by = kwargs.get('order_by',None)
+        if order_by == None and where == None:
+            # do the related order by
+            sql = 'SELECT item.* FROM {} '.format(self.table_name)
+            sql += 'JOIN category on item.cat_id = category.id '
+            sql += 'ORDER BY category.name, item.name'
+            return sql
+        # else do a normal select
+        return super()._select_sql(**kwargs)
+
     def stock_on_hand(self,id):
-        on_hand = 0
-        if id and id > 0:
-            trxs = Transaction(self.db).select(where='item_id = {}'.format(id))
-            if trxs:
-                for trx in trxs:
-                    on_hand += trx.qty
-        return on_hand
+        id = cleanRecordID(id)
+        return self.db.execute('select sum(qty) as qty from trx where item_id = {}'.format(id)).fetchone()['qty']
+        
+        
 
 class Category(SqliteTable):
     """
@@ -50,6 +71,7 @@ class Category(SqliteTable):
             name TEXT
             """
         super().create_table(sql)
+        
 
 class Transaction(SqliteTable):
     """
