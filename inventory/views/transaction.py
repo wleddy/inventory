@@ -1,10 +1,9 @@
 from flask import request, session, g, redirect, url_for, abort, \
      render_template, flash, Blueprint, Response
 from users.admin import login_required, table_access_required
-from users.utils import printException, cleanRecordID
+from users.utils import printException, cleanRecordID, getDatetimeFromString
 from datetime import datetime
 from inventory.models import Item, Category, Uom, Transaction
-from inventory.utils import str_to_short_date
 
 mod = Blueprint('transaction',__name__, template_folder='../templates', url_prefix='/trx')
 
@@ -37,22 +36,71 @@ def display():
     return render_template('trx_list.html',recs=recs,item=item)
     
     
-@mod.route('/add',methods=["GET", "POST",])
-@mod.route('/add/',methods=["GET", "POST",])
-@mod.route('/add/<int:item_id>/',methods=["GET", "POST",])
+@mod.route('/edit_from_list',methods=["GET", "POST",])
+@mod.route('/edit_from_list/',methods=["GET", "POST",])
+@mod.route('/edit_from_list/<int:id>/',methods=["GET", "POST",])
+@mod.route('/edit_from_list/<int:id>/<int:item_id>/',methods=["GET", "POST",])
 @table_access_required(Transaction)
-def add(item_id=None):
+def edit_from_list(id=None,item_id=None):
+    """Handle creation of transaction from the Item record form"""
+    setExits()
+    #import pdb;pdb.set_trace()
+    
     item_id=cleanRecordID(item_id)
-    item = None
-    if item_id:
-        item = Item(g.db).get(item_id)
+    item_rec = None
+    rec = None
     
-    if not item:
-        return "This is not a valid item id"
+    transaction = Transaction(g.db)
+    trx_id = cleanRecordID(id)
+    if trx_id > 0:
+        rec = transaction.get(trx_id)
+        
+    if rec:
+        item_id = rec.item_id
+    else:
+        rec = transaction.new()
     
-    g.inv_item_id = item_id
+    # Handle Response?
+    if request.form:
+        #import pdb;pdb.set_trace()
+        error_list=[]
+        transaction.update(rec,request.form)
+        if save_record(rec,error_list):
+            return "success" # the success function looks for this...
+        else:
+            pass
+            
     
-    return edit(0)
+    if item_id > 0:
+        item_rec = Item(g.db).get(item_id)
+    
+    if not item_rec:
+        flash("This is not a valid item id")
+        return "failure: This is not a valid item id."
+    else:
+        rec.item_id=item_id
+        
+            
+    return render_template('trx_edit_from_list.html',rec=rec,current_item=item_rec)
+    
+@mod.route('/add_from_list/',methods=["GET", "POST",])
+@mod.route('/add_from_list/<int:item_id>/',methods=["GET", "POST",])
+@table_access_required(Transaction)
+def add_from_list(item_id=None):
+    import pdb;pdb.set_trace()
+    
+    return edit_from_list(0,item_id)
+        
+    
+@mod.route('/delete_from_list/',methods=["GET", "POST",])
+@mod.route('/delete_from_list/<int:id>/',methods=["GET", "POST",])
+@table_access_required(Transaction)
+def delete_from_list(id=None):
+    setExits()
+    if handle_delete(id):
+        return "success"
+
+    return 'failure: Could not delete that {}'.format(g.title)
     
 @mod.route('/edit',methods=["GET", "POST",])
 @mod.route('/edit/',methods=["GET", "POST",])
@@ -93,6 +141,7 @@ def edit(id=None):
                 
             
     elif request.form:
+        current_item = Item(g.db).get(cleanRecordID(request.form.get('item_id',"0")))
         if id == 0:
             rec = transaction.new()
         else:
@@ -102,26 +151,28 @@ def edit(id=None):
                 return redirect(g.listURL)
                 
         transaction.update(rec,request.form)
-        if validate_form(rec):
-            transaction.save(rec)
-            try:
-                g.db.commit()
-                #Save the date and comment to session
-                session['last_trx'] = {"created":rec.created,"note":rec.note}
-                return redirect(g.listURL)
-                
-            except Exception as e:
-                g.db.rollback()
-                flash(printException('Error attempting to save Transaction record',str(e)))
-                return redirect(g.listURL)
+        error_list = []
+        if save_record(rec,error_list):
+            return redirect(g.listURL)
         else:
-            current_item = Item(g.db).get(cleanRecordID(request.form.get('item_id',"0")))
-        #    rec = transaction.new()
-        #    transaction.update(rec,request.form)
+            for err in error_list:
+                flash(err)
+        return redirect(g.listURL)
                     
     return render_template('trx_edit.html',rec=rec,current_item=current_item,items=items)
 
 
+@mod.route('/get_trx_list/',methods=["GET", ])
+@mod.route('/get_trx_list/<int:item_id>/',methods=["GET", ])
+def get_list_for_item(item_id=None):
+    """Render an html snippet of the transaciton list for the item"""
+    item_id = cleanRecordID(item_id)
+    trxs = None
+    if item_id and item_id > 0:
+        trxs = Transaction(g.db).select(where='item_id = {}'.format(item_id))
+        
+    return render_template('trx_embed_list.html',trxs=trxs,item_id=item_id)
+    
     
 @mod.route('/delete',methods=["GET", "POST",])
 @mod.route('/delete/',methods=["GET", "POST",])
@@ -129,44 +180,81 @@ def edit(id=None):
 @table_access_required(Transaction)
 def delete(id=None):
     setExits()
+    if handle_delete(id):
+        flash("{} Deleted".format(g.title))
+        
+    return redirect(g.listURL)
+    
+    
+def handle_delete(id=None):
     if id == None:
         id = request.form.get('id',request.args.get('id',-1))
     
     id = cleanRecordID(id)
     if id <=0:
-        flash("That is not a valid record ID")
-        return redirect(g.listURL)
+        #flash("That is not a valid record ID")
+        return False
         
     rec = Transaction(g.db).get(id)
     if not rec:
-        flash("Record not found")
+        #flash("Record not found")
+        return False
     else:
         Transaction(g.db).delete(rec.id)
         g.db.commit()
-        flash("Record Deleted")
-        
-    return redirect(g.listURL)
+        return True
+    
+    
+def save_record(rec,err_list=[]):
+    """Attempt to validate and save a record"""
+    if validate_form(rec):
+        Transaction(g.db).save(rec)
+        try:
+            g.db.commit()
+            #Save the date and comment to session
+            session['last_trx'] = {"created":rec.created,"note":rec.note}
+            return True
+            
+        except Exception as e:
+            g.db.rollback()
+            err_list.append(printException('Error attempting to save Transaction record',str(e)))
+            return false
     
     
 def validate_form(rec):
     valid_form = True
     datestring = request.form.get('created','').strip()
+    createdDate = getDatetimeFromString(datestring)
     if datestring == '':
         valid_form = False
         flash('Date may not be empty')
         
-    if str_to_short_date(datestring) is None:
+    if createdDate is None:
         flash('Date is not in a known format ("mm/dd/yy")')
         valid_form = False
+    else:
+        rec.created = createdDate
+        
     
     #Try to coerse qty to a number
-    try:
-        rec.qty = float(request.form.get('qty',0))
-        if rec.qty - int(rec.qty) == 0:
-            rec.qty = int(rec.qty)
-    except ValueError as e:
-        flash('Could not convert Qty {} to a number'.format(request.form.get('qty',"")))
+    rec.qty = request.form.get('qty','').strip()
+    if rec.qty =='':
+        flash('Quantity is required')
         valid_form = False
+    else:
+        try:
+            rec.qty = float(rec.qty)
+            if rec.qty == 0:
+                flash('Quantity may not be 0')
+                valid_form = False
+                
+            #truncate qty if int
+            if rec.qty - int(rec.qty) == 0:
+                rec.qty = int(rec.qty)
+                
+        except ValueError as e:
+            flash('Could not convert Qty {} to a number'.format(rec.qty))
+            valid_form = False
     
     # Value must be a number
     try:

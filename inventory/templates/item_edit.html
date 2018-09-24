@@ -29,30 +29,10 @@
             </fieldset>
         </form>
     </div>    
-    <div id="trx_list" style="margin-left:32%;width:40%;min-height:8em;border: 1pt solid #666;">
-        <h4>Quantity On Hand: {{on_hand}}</h4>
-        <table>
-        <tr>
-            <th>Date</th>
-            <th>Qty</th>
-            <th>UOM</th>
-            <th>Value</th>
-            <th colspan="2"><a href="{{url_for('transaction.add')}}{{rec.id}}">Add</a></th>
-        </tr>
-    {% if trxs %}
-        {% for trx in trxs %}
-            <tr>
-                <td>{{trx.created}}</td>
-                <td style="text-align:right;">{{trx.qty | money() }}</td>
-                <td>{{trx.UOM}}</td>
-                <td style="text-align:right;">{{ trx.value | money() }}</td>
-                <td>delete</td>
-                <td>edit</td>
-            </tr>
-        {% endfor%}
-    {% else %}
-        <p>No Transactions yet...</p>
-    {% endif %}
-        </table>
+    <h4 id="item-QOH">Quantity On Hand: {{on_hand}}</h4>
+    <div id="trx_list" style="margin-left:32%;width:33%;height:20em;overflow:scroll;border: 1pt solid #666;">
+        <!-- transactions list will display here -->
+        {{ transactionList | safe }}
     </div>
+    
 {% endblock body %}

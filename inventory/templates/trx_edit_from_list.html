@@ -1,0 +1,17 @@
+{# transaction form for response to AJAX request #}
+{% include "flasher.html"%}
+<form id="transactionFromListForm"  action="" method="POST">
+	<div class="transaction-buttons data-element">
+        {% include "trx_edit_form.html"%}
+		<p>
+		<span class="cancel-link" onclick="cancelModalForm()">Cancel</span>
+		<input class="transactionSave" type="button" 
+            onclick="submitModalForm('transactionFromListForm', 
+            '{{ url_for('transaction.edit_from_list')}}{{rec.id | default(0,True)}}/{{ rec.item_id | default(0,True)}}/', 
+            'trx_list', 
+            '{{ url_for('transaction.get_list_for_item')}}{{ rec.item_id }}/')" 
+            name="Save" value="Save" />
+		</p>
+	</div>
+</form>
+</div>

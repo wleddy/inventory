@@ -15,7 +15,7 @@
 		{% for rec in recs %}
 	    <tr>
 			<td style="min-width:80px;"><a href="{{ g.editURL }}{{ rec.id }}/">{{ item[rec.item_id]|default("None",true) }}</a></td>
-			<td style="min-width:100px;">{{ rec.created|default('None') | date_string }}</td>
+			<td style="min-width:100px;">{{ rec.created|default('None') | short_date_string }}</td>
 			<td style="min-width:80px;text-align:right;">{{ rec.qty|default("0",true) }}</td>
 			<td style="min-width:80px;text-align:right;">{{ rec.value|default("0.00",true)|money() }}</td>
 			<td style="min-width:200px;">{{ rec.note|default("",true) }}</td>

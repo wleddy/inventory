@@ -1,0 +1,22 @@
+<p><span class="script-link" onclick="editFromList('{{url_for('transaction.edit_from_list')}}0/{{item_id}}/')">Add Transaction...</span></p>
+{% if trxs %}
+    <table>
+    <tr>
+        <th>Date</th>
+        <th>Qty</th>
+        <th>Value</th>
+        <th colspan="2">Actions</th>
+    </tr>
+    {% for trx in trxs %}
+        <tr id="trx-{{trx.id}}">
+            <td>{{trx.created | short_date_string }}</td>
+            <td style="text-align:right;">{{trx.qty | money() }}</td>
+            <td style="text-align:right;">{{ trx.value | money() }}</td>
+            <td><span class="script-link" onclick="deleteFromList('{{ url_for('transaction.delete_from_list')}}{{ trx.id }}/','trx-{{trx.id}}')">delete</span></td>
+            <td><span class="script-link" onclick="editFromList('{{ url_for('transaction.edit_from_list')}}{{ trx.id }}/','trx_list')">edit</span></td>
+        </tr>
+    {% endfor%}
+{% else %}
+    <p>No Transactions to list...</p>
+    </table>
+{% endif %}
