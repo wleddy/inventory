@@ -15,7 +15,7 @@ def setExits():
     g.title = 'Unit of Measure'
 
 @mod.route('/',methods=["GET",])
-@table_access_required(Category)
+@table_access_required(Uom)
 def display():
     setExits()
     
