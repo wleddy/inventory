@@ -12,7 +12,7 @@
             <td>{{trx.created | short_date_string }}</td>
             <td style="text-align:right;">{{trx.qty | money() }}</td>
             <td style="text-align:right;">{{ trx.value | money() }}</td>
-            <td><span class="script-link" onclick="deleteFromList('{{ url_for('transaction.delete_from_list')}}{{ trx.id }}/','trx-{{trx.id}}')">delete</span></td>
+            <td><span class="script-link" onclick="$.ajaxSetup({'async' : false});deleteFromList('{{ url_for('transaction.delete_from_list')}}{{ trx.id }}/','trx-{{trx.id}}');update_stock_on_hand();">delete</span></td>
             <td><span class="script-link" onclick="editFromList('{{ url_for('transaction.edit_from_list')}}{{ trx.id }}/','trx_list')">edit</span></td>
         </tr>
     {% endfor%}
@@ -22,5 +22,8 @@
 {% endif %}
 
 <script type="text/javascript">
-    $("#item-QOH-value").load("{{ url_for('item.get_stock_on_hand')}}{{item_id}}/")
-</script>k
+    function update_stock_on_hand(){
+        $("#item-QOH-value").load("{{ url_for('item.get_stock_on_hand')}}{{item_id | default("0", True)}}/");
+    }
+    update_stock_on_hand();
+</script>
