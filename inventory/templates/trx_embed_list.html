@@ -20,3 +20,7 @@
     <p>No Transactions to list...</p>
     </table>
 {% endif %}
+
+<script type="text/javascript">
+    $("#item-QOH-value").load("{{ url_for('item.get_stock_on_hand')}}{{item_id}}/")
+</script>k

@@ -112,7 +112,14 @@ def cancel(id=None):
         
         
     return redirect(g.listURL)
+    
 
+@mod.route('/get_stock_on_hand',methods=["GET",])
+@mod.route('/get_stock_on_hand/',methods=["GET",])
+@mod.route('/get_stock_on_hand/<int:item_id>',methods=["GET",])
+def get_stock_on_hand(item_id=0):  
+    return Item(g.db).stock_on_hand(cleanRecordID(item_id))
+    
     
 @mod.route('/transaction_list_for_item',methods=["GET",])
 @mod.route('/transaction_list_for_item/<int:item_id>',methods=["GET",])
