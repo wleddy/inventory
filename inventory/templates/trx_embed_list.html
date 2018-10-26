@@ -12,8 +12,8 @@
             <td>{{trx.created | short_date_string }}</td>
             <td style="text-align:right;">{{trx.qty | money() }}</td>
             <td style="text-align:right;">{{ trx.value | money() }}</td>
-            <td><span class="script-link" onclick="$.ajaxSetup({'async' : false});deleteFromList('{{ url_for('transaction.delete_from_list')}}{{ trx.id }}/','trx-{{trx.id}}');update_stock_on_hand();">delete</span></td>
             <td><span class="script-link" onclick="editFromList('{{ url_for('transaction.edit_from_list')}}{{ trx.id }}/','trx_list')">edit</span></td>
+            <td><span class="script-link" onclick="$.ajaxSetup({'async' : false});deleteFromList('{{ url_for('transaction.delete_from_list')}}{{ trx.id }}/','trx-{{trx.id}}');update_stock_on_hand();">delete</span></td>
         </tr>
     {% endfor%}
 {% else %}
