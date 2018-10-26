@@ -59,6 +59,9 @@ def edit_from_list(id=None,item_id=None):
         item_id = rec.item_id
     else:
         rec = transaction.new()
+        rec.created = datetime.now()
+        if 'last_trx' in session:
+            transaction.update(rec,session['last_trx'])
     
     # Handle Response?
     if request.form:
@@ -83,13 +86,13 @@ def edit_from_list(id=None,item_id=None):
             
     return render_template('trx_edit_from_list.html',rec=rec,current_item=item_rec)
     
-@mod.route('/add_from_list/',methods=["GET", "POST",])
-@mod.route('/add_from_list/<int:item_id>/',methods=["GET", "POST",])
-@table_access_required(Transaction)
-def add_from_list(item_id=None):
-    import pdb;pdb.set_trace()
-    
-    return edit_from_list(0,item_id)
+#@mod.route('/add_from_list/',methods=["GET", "POST",])
+#@mod.route('/add_from_list/<int:item_id>/',methods=["GET", "POST",])
+#@table_access_required(Transaction)
+#def add_from_list(item_id=None):
+#    import pdb;pdb.set_trace()
+#    
+#    return edit_from_list(0,item_id)
         
     
 @mod.route('/delete_from_list/',methods=["GET", "POST",])
