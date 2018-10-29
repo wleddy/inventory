@@ -69,29 +69,27 @@ def edit(id=None):
     on_hand = item.stock_on_hand(id)
                 
     if request.form:
-        if not validate_form():
-            rec = request.form
-            
-        if id == 0:
-            rec = item.new()
-        else:
-            rec = item.get(id)
+        rec = item.get(id)
         if rec:
             item.update(rec,request.form)
-            item.save(rec)
-            try:
-                g.db.commit()
-                return redirect(g.listURL)
-                    
-            except Exception as e:
-                g.db.rollback()
-                flash(printException('Error attempting to save Item record',str(e)))
-                return redirect(g.listURL)
+            if validate_form():
+                item.save(rec)
+                try:
+                    g.db.commit()
+                    return redirect(g.listURL)
+                
+                except Exception as e:
+                    g.db.rollback()
+                    flash(printException('Error attempting to save Item record',str(e)))
+                    return redirect(g.listURL)
+            else:
+                pass # There are imput errors
+                
         else:
             flash('Record not Found')
             return redirect(g.listURL)
             
-    transactionList = get_list_for_item(id)
+    transactionList = get_list_for_item(rec.id)
     
     return render_template('item_edit.html',rec=rec,categories=categories,uoms=uoms,transactionList=transactionList,on_hand=on_hand)
 
@@ -167,5 +165,9 @@ def validate_form():
         valid_form = False
         flash('The name may not be empty')
     
+    if request.form['cat_id'] == None or request.form['cat_id'] == "0":
+        valid_form = False
+        flash('You must select a category for this item')
+        
     return valid_form
     

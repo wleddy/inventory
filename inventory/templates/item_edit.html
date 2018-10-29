@@ -19,7 +19,7 @@
                     </select>
                 </p>
                 <p><span>Category: </span>
-                    <select  name="cat_id" >
+                    <select  name="cat_id" required >
                         <option value="0" ><em>None</em></option>
                         {% for category in categories %}
                         <option value="{{ category.id }}" {% if rec.cat_id == category.id %}selected{% endif %} >{{ category.name}}</option>
