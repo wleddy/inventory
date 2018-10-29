@@ -22,6 +22,7 @@ def stock_on_hand_report():
         extras.append('category')
         extras.append('added')
         extras.append('used')
+        extras.append('lifo cost')
         extras.append('on hand')
         fieldnames.extend(extras)
     
@@ -29,6 +30,7 @@ def stock_on_hand_report():
         with output as csvfile:
             writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
             writer.writeheader()
+            
             for rec in recs:
                 temp_row = rec._asdict()
                 # temp_row is an orderedDict and elements can't be removed
@@ -37,10 +39,11 @@ def stock_on_hand_report():
                     if key not in fields_to_ignore:
                         row[key] = value
                     
-                row[extras[0]] = items.category(rec.cat_id)
+                row[extras[0]] = Category(g.db).category_name(rec.cat_id)
                 row[extras[1]] = items.additions(rec.id)
                 row[extras[2]] = items.subtractions(rec.id)
-                row[extras[3]] = items.stock_on_hand(rec.id)
+                row[extras[3]] = items.lifo_cost(rec.id)
+                row[extras[4]] = items.stock_on_hand(rec.id)
                 writer.writerow(row)
                     
             out = output.getvalue()

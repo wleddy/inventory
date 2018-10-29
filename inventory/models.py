@@ -49,21 +49,33 @@ class Item(SqliteTable):
 
     def stock_on_hand(self,id):
         id = cleanRecordID(id)
-        return self.db.execute('select COALESCE(sum(qty), 0) as qty from trx where item_id = {}'.format(id)).fetchone()['qty']
+        rec = self.db.execute('select COALESCE(sum(qty), 0) as qty from trx where item_id = {}'.format(id)).fetchone()
+        return self.handle_rec_value(rec,'qty')
         
     def additions(self,id):
         id = cleanRecordID(id)
-        return self.db.execute('select COALESCE(sum(qty), 0) as additions from trx where item_id = {} and qty > 0'.format(id)).fetchone()['additions']
-            
+        rec = self.db.execute('select COALESCE(sum(qty), 0) as additions from trx where item_id = {} and qty > 0'.format(id)).fetchone()
+        return self.handle_rec_value(rec,'additions')
+        
     def subtractions(self,id):
         id = cleanRecordID(id)
-        return self.db.execute('select COALESCE(sum(qty), 0) as subtractions from trx where item_id = {} and qty < 0'.format(id)).fetchone()['subtractions']
+        rec = self.db.execute('select COALESCE(sum(qty), 0) as subtractions from trx where item_id = {} and qty < 0'.format(id)).fetchone()
+        return self.handle_rec_value(rec,'subtractions')
         
-    def category(self,id):
+    def lifo_cost(self,id):
         id = cleanRecordID(id)
-        return self.db.execute('select name from category where id = {}'.format(id)).fetchone()['name']
-    
+        rec = self.db.execute('select COALESCE(value, 0) as lifo_cost from trx where item_id = {} and qty > 0 order by created desc'.format(id)).fetchone()
+        return self.handle_rec_value(rec,'lifo_cost')
+            
+    def handle_rec_value(self,rec,elem):
+        """Handle the case where no record was found in the calls above"""
+        if rec and elem in rec.keys():
+            return rec[elem]
+        else:
+            return 0
         
+    
+            
 class Category(SqliteTable):
     """
         Items may be orginaized by category
@@ -83,6 +95,13 @@ class Category(SqliteTable):
             """
         super().create_table(sql)
         
+    def category_name(self,id):
+        id = cleanRecordID(id)
+        rec = self.get(id)
+        if rec:
+            return rec.name
+        else:
+            return "Unknown"
 
 class Transaction(SqliteTable):
     """
