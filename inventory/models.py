@@ -64,7 +64,7 @@ class Item(SqliteTable):
         
     def lifo_cost(self,id):
         id = cleanRecordID(id)
-        rec = self.db.execute('select COALESCE(value, 0) as value from trx where item_id = {} and qty > 0 order by created desc'.format(id)).fetchone()
+        rec = self.db.execute('select COALESCE(value, 0) as value from trx where item_id = {} and qty > 0 and value > 0 order by created desc'.format(id)).fetchone()
         return self.handle_rec_value(rec,'value')
             
     def handle_rec_value(self,rec,elem):
