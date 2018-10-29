@@ -54,18 +54,18 @@ class Item(SqliteTable):
         
     def additions(self,id):
         id = cleanRecordID(id)
-        rec = self.db.execute('select COALESCE(sum(qty), 0) as additions from trx where item_id = {} and qty > 0'.format(id)).fetchone()
-        return self.handle_rec_value(rec,'additions')
+        rec = self.db.execute('select COALESCE(sum(qty), 0) as qty from trx where item_id = {} and qty > 0'.format(id)).fetchone()
+        return self.handle_rec_value(rec,'qty')
         
     def subtractions(self,id):
         id = cleanRecordID(id)
-        rec = self.db.execute('select COALESCE(sum(qty), 0) as subtractions from trx where item_id = {} and qty < 0'.format(id)).fetchone()
-        return self.handle_rec_value(rec,'subtractions')
+        rec = self.db.execute('select COALESCE(sum(qty), 0) as qty from trx where item_id = {} and qty < 0'.format(id)).fetchone()
+        return self.handle_rec_value(rec,'qty')
         
     def lifo_cost(self,id):
         id = cleanRecordID(id)
-        rec = self.db.execute('select COALESCE(value, 0) as lifo_cost from trx where item_id = {} and qty > 0 order by created desc'.format(id)).fetchone()
-        return self.handle_rec_value(rec,'lifo_cost')
+        rec = self.db.execute('select COALESCE(value, 0) as value from trx where item_id = {} and qty > 0 order by created desc'.format(id)).fetchone()
+        return self.handle_rec_value(rec,'value')
             
     def handle_rec_value(self,rec,elem):
         """Handle the case where no record was found in the calls above"""
