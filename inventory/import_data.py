@@ -7,7 +7,7 @@ sys.path.append('') ##get import to look in the working dir.
 import csv
 from datetime import datetime
 import os.path
-from users.database import Database
+from takeabeltof.database import Database
 from inventory.models import Category, Item, Uom, Transaction
 
 def import_data(filespec):

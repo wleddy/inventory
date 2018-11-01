@@ -1,4 +1,4 @@
-from users.database import Database, SqliteTable
+from takeabeltof.database import Database, SqliteTable
 from takeabeltof.utils import cleanRecordID
 from takeabeltof.date_utils import local_datetime_now
 from datetime import timedelta

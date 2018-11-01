@@ -1,9 +1,10 @@
 from flask import request, session, g, redirect, url_for, abort, \
      render_template, flash, Blueprint, Response
 from users.admin import login_required, table_access_required
-from users.utils import printException, cleanRecordID, getDatetimeFromString
-from datetime import datetime
+from takeabeltof.utils import printException, cleanRecordID
+from takeabeltof.date_utils import getDatetimeFromString
 from inventory.models import Item, Category, Uom, Transaction
+from takeabeltof.date_utils import local_datetime_now
 
 mod = Blueprint('transaction',__name__, template_folder='../templates', url_prefix='/trx')
 
@@ -59,7 +60,7 @@ def edit_from_list(id=None,item_id=None):
         item_id = rec.item_id
     else:
         rec = transaction.new()
-        rec.created = datetime.now()
+        rec.created = local_datetime_now()
         if 'last_trx' in session:
             transaction.update(rec,session['last_trx'])
     
@@ -128,7 +129,7 @@ def edit(id=None):
     if id >= 0 and not request.form:
         if id == 0:
             rec = transaction.new()
-            rec.created = datetime.now()
+            rec.created = local_datetime_now()
             if 'last_trx' in session:
                 transaction.update(rec,session['last_trx'])
         else:

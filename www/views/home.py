@@ -40,7 +40,7 @@ def contact():
     setExits()
     g.name = 'Contact Us'
     from app import app
-    from users.mailer import send_message
+    from takeabeltof.mailer import send_message
     rendered_html = render_markdown_for(mod,'contact.md')
     show_form = True
     context = {}

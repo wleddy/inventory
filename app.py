@@ -2,7 +2,7 @@ from flask import Flask, render_template, g, session, url_for, request, redirect
 from flask_mail import Mail
 from datetime import datetime
 
-from users.database import Database
+from takeabeltof.database import Database
 from users.models import User,Role,init_db, Pref
 from users.admin import Admin
 
@@ -29,7 +29,7 @@ def get_db(filespec=app.config['DATABASE_PATH']):
         g.db = Database(filespec).connect()
     return g.db
 
-from users.jinja_filters import register_jinja_filters
+from takeabeltof.jinja_filters import register_jinja_filters
 register_jinja_filters(app)
 from inventory.utils import register_inv_filters
 register_inv_filters(app)

@@ -1,5 +1,5 @@
 from flask import g
-from users.utils import cleanRecordID
+from takeabeltof.utils import cleanRecordID
 
 """
 Some utility functions

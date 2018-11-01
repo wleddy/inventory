@@ -11,6 +11,15 @@ SITE_NAME = "My New Web Site"
 DEBUG = True
 REQUIRE_SSL = (not DEBUG)
 
+# Timezone setting
+# Un-comment one or add yours
+# for full list see pytz.all_timezones
+
+TIME_ZONE = 'US/Pacific'
+#TIME_ZONE = 'US/Mountain'
+#TIME_ZONE = 'US/Central'
+#TIME_ZONE = 'US/Eastern'
+
 HOST_PROTOCOL = "http"
 if REQUIRE_SSL:
     HOST_PROTOCOL = "https"
