@@ -49,7 +49,7 @@ def stock_on_hand_report(start_date=None,end_date=None):
                 row[extras[0]] = Category(g.db).category_name(rec.cat_id)
                 row[extras[1]] = items.additions(rec.id,start_date,end_date)
                 row[extras[2]] = items.subtractions(rec.id,start_date,end_date)
-                row[extras[3]] = items.lifo_cost(rec.id,start_date,end_date)
+                row[extras[3]] = items.lifo_cost(rec.id) # get the most recent cost
                 row[extras[4]] = items.stock_on_hand(rec.id)
                 writer.writerow(row)
                     
