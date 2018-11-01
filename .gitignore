@@ -10,3 +10,5 @@ __pycache__
 
 ## The User repo has it's own master
 users/
+## Some required utils
+takeabeltof/

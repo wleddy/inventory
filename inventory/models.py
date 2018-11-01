@@ -1,5 +1,7 @@
 from users.database import Database, SqliteTable
-from users.utils import cleanRecordID
+from takeabeltof.utils import cleanRecordID
+from takeabeltof.date_utils import local_datetime_now
+from datetime import timedelta
 
 class Item(SqliteTable):
     """
@@ -52,19 +54,36 @@ class Item(SqliteTable):
         rec = self.db.execute('select COALESCE(sum(qty), 0) as qty from trx where item_id = {}'.format(id)).fetchone()
         return self.handle_rec_value(rec,'qty')
         
-    def additions(self,id):
+    def additions(self,id,start_date=None,end_date=None):
         id = cleanRecordID(id)
-        rec = self.db.execute('select COALESCE(sum(qty), 0) as qty from trx where item_id = {} and qty > 0'.format(id)).fetchone()
+        #import pdb;pdb.set_trace()
+        start_date,end_date = self.set_dates(start_date,end_date)
+        sql = """select COALESCE(sum(qty), 0) as qty from trx where item_id = {} and qty > 0 
+        and date(created) >= date("{}") and date(created) <= date("{}")
+        """.format(id,start_date,end_date)
+        
+        rec = self.db.execute(sql).fetchone()
         return self.handle_rec_value(rec,'qty')
         
-    def subtractions(self,id):
+    def subtractions(self,id,start_date=None,end_date=None):
         id = cleanRecordID(id)
-        rec = self.db.execute('select COALESCE(sum(qty), 0) as qty from trx where item_id = {} and qty < 0'.format(id)).fetchone()
+        start_date,end_date = self.set_dates(start_date,end_date)
+        sql = """
+            select COALESCE(sum(qty), 0) as qty from trx where item_id = {} and qty < 0
+            and date(created) >= date("{}") and date(created) <= date("{}")
+        """.format(id,start_date,end_date)
+        rec = self.db.execute(sql).fetchone()
         return self.handle_rec_value(rec,'qty')
         
-    def lifo_cost(self,id):
+    def lifo_cost(self,id,start_date=None,end_date=None):
         id = cleanRecordID(id)
-        rec = self.db.execute('select COALESCE(value, 0) as value from trx where item_id = {} and qty > 0 and value > 0 order by created desc'.format(id)).fetchone()
+        start_date,end_date = self.set_dates(start_date,end_date)
+        sql = """
+            select COALESCE(value, 0) as value from trx where item_id = {} and qty > 0 and value > 0 
+            and date(created) >= date("{}") and date(created) <= date("{}")
+            order by created desc
+        """.format(id,start_date,end_date)
+        rec = self.db.execute(sql).fetchone()
         return self.handle_rec_value(rec,'value')
             
     def handle_rec_value(self,rec,elem):
@@ -74,7 +93,14 @@ class Item(SqliteTable):
         else:
             return 0
         
+    def set_dates(self,start_date,end_date):
+        """Set the start and end dates if none provided"""
+        if start_date is None:
+            start_date = local_datetime_now() - timedelta(days=365 * 18) # a long time ago
+        if end_date is None:
+            end_date = local_datetime_now() + timedelta(days=365) #Next year
     
+        return start_date, end_date
             
 class Category(SqliteTable):
     """
