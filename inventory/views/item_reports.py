@@ -3,6 +3,7 @@
 from inventory.models import Item, Category, Transaction
 from flask import Response,g
 from takeabeltof.date_utils import local_datetime_now
+from takeabeltof.jinja_filters import iso_date_string
 from datetime import timedelta
 import csv
 from io import StringIO
@@ -36,6 +37,9 @@ def stock_on_hand_report(start_date=None,end_date=None):
         output = StringIO()
         with output as csvfile:
             writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+            from app import app
+            row = {fieldnames[0]: "{} Stock Report from {} thru {}".format(app.config["SITE_NAME"],iso_date_string(start_date),iso_date_string(end_date)) }
+            writer.writerow(row)
             writer.writeheader()
             
             for rec in recs:
@@ -50,7 +54,7 @@ def stock_on_hand_report(start_date=None,end_date=None):
                 row[extras[1]] = items.additions(rec.id,start_date,end_date)
                 row[extras[2]] = items.subtractions(rec.id,start_date,end_date)
                 row[extras[3]] = items.lifo_cost(rec.id) # get the most recent cost
-                row[extras[4]] = items.stock_on_hand(rec.id)
+                row[extras[4]] = items.stock_on_hand(rec.id,end_date)
                 writer.writerow(row)
                     
             out = output.getvalue()

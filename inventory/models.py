@@ -49,9 +49,17 @@ class Item(SqliteTable):
         # else do a normal select
         return super()._select_sql(**kwargs)
 
-    def stock_on_hand(self,id):
+    def stock_on_hand(self,id,end_date=None):
         id = cleanRecordID(id)
-        rec = self.db.execute('select COALESCE(sum(qty), 0) as qty from trx where item_id = {}'.format(id)).fetchone()
+        if end_date is None:
+            end_date = local_datetime_now()
+            
+        sql = """select COALESCE(sum(qty), 0) as qty 
+                from trx where item_id = {}
+                and date(created) <= date("{}")
+                """.format(id,end_date)
+                
+        rec = self.db.execute(sql).fetchone()
         return self.handle_rec_value(rec,'qty')
         
     def additions(self,id,start_date=None,end_date=None):

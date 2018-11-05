@@ -2,6 +2,7 @@ from flask import request, session, g, redirect, url_for, abort, \
      render_template, flash, Blueprint, Response
 from users.admin import login_required, table_access_required
 from takeabeltof.utils import printException, cleanRecordID
+from takeabeltof.date_utils import local_datetime_now, getDatetimeFromString
 from inventory.models import Item, Category, Uom, Transaction
 from .item_reports import stock_on_hand_report
 from inventory.views.transaction import get_list_for_item
@@ -151,13 +152,32 @@ def delete(id=None):
         
     return redirect(g.listURL)
     
-@mod.route('/stock_report',methods=["GET",])
-@mod.route('/stock_report/',methods=["GET",])
+@mod.route('/stock_report',methods=["GET","POST",])
+@mod.route('/stock_report/',methods=["GET","POST",])
 @login_required
 def stock_report():
-    return stock_on_hand_report()  
+    """Ask user for report date range then create report on post"""
+    setExits()
+    g.title = "Inventory Stock Report"
+    start_date = None
+    end_date = None
+    if request.form:
+        start_date = getDatetimeFromString(request.form.get("start_date",None))
+        end_date = getDatetimeFromString(request.form.get("end_date",None))
+        if start_date and end_date and start_date < end_date:
+            return stock_on_hand_report(start_date,end_date)
+        else:
+            start_date = request.form['start_date']
+            end_date = request.form['end_date']
+            flash("Those don't look like valid dates... Try 'YYYY-MM-DD'")
+    ## else send form page
+    if not start_date:
+        start_date = local_datetime_now().replace(month=1, day=1)
+    if not end_date:
+        end_date = local_datetime_now().replace(month=12, day=31)
     
-      
+    return render_template('item_report_input.html',start_date=start_date,end_date=end_date)
+    
 def validate_form():
     valid_form = True
     if request.form['name'].strip() == '':

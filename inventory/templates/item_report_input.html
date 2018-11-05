@@ -1,0 +1,14 @@
+{% extends "layout.html" %}
+{% block title %}{{ g.title }} List{% endblock %}
+{% block body %}
+	<h2>{{g.title}}</h2>
+    <div id="item_report_form" >
+        <form action="#" method=post class="entry">
+            <fieldset>
+                <p><span>Report Start Date:</span><input type="date" size="30" name="start_date" required value="{{ start_date | iso_date_string }}" /></p>
+                <p><span>Report End Date: </span><input type="date" size="30" name="end_date" value="{{ end_date | iso_date_string }}" /></p>
+                <p><input type="submit" name="submit" value="Report">&nbsp;&nbsp;<a href="{{ g.listURL }}">Done</a></p>
+            </fieldset>
+        </form>
+    </div>
+{% endblock %}
