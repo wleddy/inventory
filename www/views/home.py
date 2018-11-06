@@ -16,6 +16,9 @@ def setExits():
 
 @mod.route('/')
 def home():
+    if g.user:
+        return redirect("/items/")
+        
     setExits()
 
     rendered_html = render_markdown_for(mod,'index.md')
