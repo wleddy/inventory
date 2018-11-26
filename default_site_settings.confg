@@ -9,7 +9,14 @@
 HOST_NAME = 'localhost:5000' # this should usually be SERVER_NAME
 SITE_NAME = "My New Web Site"
 DEBUG = True
+TESTING = DEBUG
+
 REQUIRE_SSL = (not DEBUG)
+REPORT_404_ERRORS = DEBUG
+
+CONTACT_EMAIL_ADDR = "admin@example.com"
+CONTACT_NAME = "Some Name"
+
 
 # Timezone setting
 # Un-comment one or add yours

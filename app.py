@@ -72,6 +72,18 @@ def _teardown(exception):
         g.db.close()
 
 
+@app.errorhandler(404)
+def page_not_found(error):
+    from takeabeltof.utils import handle_request_error
+    handle_request_error(error,request)
+    return render_template('404.html'), 404
+
+@app.errorhandler(500)
+def server_error(error):
+    from takeabeltof.utils import handle_request_error
+    handle_request_error(error,request,'error')
+    return render_template('500.html'), 500
+
 from www.views import home
 app.register_blueprint(home.mod)
 
