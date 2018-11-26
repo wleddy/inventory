@@ -1,0 +1,14 @@
+#!/usr/bin/bash
+
+git pull origin master
+
+cd takeabeltof/
+git pull origin master
+
+cd ../users/
+git pull origin master
+
+cd ../
+ECHO 'All Done'
+
+
