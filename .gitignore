@@ -7,6 +7,8 @@ instance/
 __pycache__
 .pytest_cache
 .coverage
+passenger.py
+tmp/
 
 ## The User repo has it's own master
 users/
