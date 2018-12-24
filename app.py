@@ -60,7 +60,7 @@ def _before():
         g.admin.register(Pref,url_for('pref.display'),display_name='Prefs',minimum_rank_required=1000)
         
         g.admin.register(Item,None,display_name='Inv Admin',header_row=True,minimum_rank_required=500)
-        g.admin.register(Item,url_for('item.display'),minimum_rank_required=500)
+        g.admin.register(Item,url_for('item.display'),minimum_rank_required=1)
         g.admin.register(Category,url_for('category.display'),display_name='Categories',minimum_rank_required=500)
         g.admin.register(Uom,url_for('uom.display'),display_name='UOM',minimum_rank_required=500)
         g.admin.register(Transaction,url_for('transaction.display'),display_name='Transactions',minimum_rank_required=500)
