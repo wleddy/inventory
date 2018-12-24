@@ -22,7 +22,7 @@ def setExits():
 @table_access_required(Item)
 def display():
     setExits()
-    
+    g.title = "{} List".format(g.title)
     recs = Item(g.db).select()
     
     return render_template('item_list.html',recs=recs)
@@ -34,6 +34,7 @@ def display():
 @table_access_required(Item)
 def edit(id=None):
     setExits()
+    g.title = "Edit {} Record".format(g.title)
     
     item = Item(g.db)
     transactionList = None

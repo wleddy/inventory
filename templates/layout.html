@@ -8,21 +8,62 @@
     <link rel="apple-touch-icon" type="image/png" sizes="72x72" href="{{ url_for('static', filename='apple-touch-icon-72.png') }}"><!-- iPad -->
     <link rel="apple-touch-icon" type="image/png" sizes="114x114" href="{{ url_for('static', filename='apple-touch-icon-114.png') }}"><!-- iPhone4 -->
     <link rel="icon" type="image/png" href="{{ url_for('static', filename='apple-touch-icon-114.png') }}"><!-- Opera Speed Dial, at least 144×114 px -->
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
 	
-	<link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        /* change the fixed width of the right menu here*/
+        .menu_space {
+            margin-right:200px;
+        }
+        .menu_width {
+            width:200px;
+        }
+    </style>
 
 	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
 	<script src="{{ url_for('static', filename='common.js') }}"></script>
 
+    <script>
+        // for navigation buttons
+    function w3_open(id_name) {
+        document.getElementById(id_name).style.display = "block";
+    }
+    function w3_close(id_name) {
+        document.getElementById(id_name).style.display = "none";
+    }
+    function w3_hide(id_name) {
+        document.getElementById(id_name).style.visibility = "hidden";
+    }
+    function w3_show(id_name) {
+        document.getElementById(id_name).style.visibility = "visible";
+    }
+    </script>
+
     {% block head%}{% endblock %}
 </head>
 <body>
-<div id="contain">
-    <div id="dialog"></div><div id="modal-form-contain"><div id="modal-form"></div></div>
+<div id="contain" >
+    <div id="modal-form-contain" class="w3-modal" style="overflow:hidden;padding-top:20pt!important;">
+        <div id="modal-form" class="w3-container w3-modal-content w3-card-4 w3-animate-top" style="max-height:95vh;overflow:scroll;"></div>
+    </div>
+    
     {% include "header.html"%}
+    {% if g.user or True %}
     {% include "top-nav.html"%}
-	{% include "flasher.html" %}
-	{% block body %}{% endblock %} 
+    <div class="w3-main menu_space">
+    {% else %}
+    <div>
+    {% endif %}
+        <div class="w3-container">
+            {% if not g.suppress_page_header %}
+                {% include "page_header.html" %}
+            {% endif %}
+            {% include "flasher.html" %}
+            {% block body %}{% endblock %}
+        </div>
+    </div>
 </div>
 </body>
 </html>

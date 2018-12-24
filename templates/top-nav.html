@@ -1,45 +1,31 @@
-<div id="nav">
-    {% if g.user %}
-    {% endif %}
-        <p id="mobile-menu-header" class="menu-item dropdown" onclick="" >Menu</p>
-        <div id="mobile-menu-contain">
-            <div>
-                <p class="menu-item" ><a href="/">Home</a></p>
-                <p class="menu-item" ><a href="{{ url_for('item.display')}}">Inventory Items</a></p>
-                <p class="menu-item" ><a href="{{ url_for('transaction.display')}}">Transactions</a></p>
-                <div onclick="" class="dropdown">
-                    <p class="dd-menu-header" style="border-right:solid #ccc 1pt;min-width:160pt">Reports</p>
-                    <div class="dropdown-content">
-                        <ul>
-                            <li style="min-width:160pt;"><a href="{{ url_for('item.stock_report')}}">Stock On Hand</a></li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-            <div onclick="" id="profile-menu" class="dropdown">
-                <p id="profile-header" class="dd-menu-header">
-                    {% if g.user %}My Profile{% else %}<a href="{{ url_for('login.login')}}" >Login</a>{% endif %}
-                </p>
-                <div class="dropdown-content">
-                    <ul>
-                        {% if g.user %}
-                        <li><a href="{{ url_for('user.edit')}}" >Manage Profile</a></li>
-                        <li><a href="{{ url_for('login.logout')}}">Logout</a></li>
-                            {% if g.admin and g.admin.has_access(g.user)%}
-                                {% for item in g.admin.permissions %}
-                                    {% if g.admin.has_access(g.user,item['table'])%}
-                                        {% if item['header_row'] == True %}
-                                        <p class="dd-menu-divider">{{item['display_name']}}</p>
-                                        {% else %}
-                                        <li><a href="{{item['url']}}">{{item['display_name']}}</a></li>
-                                        {% endif %}
-                                    {% endif %}
-                                {% endfor %}
-                            {% endif %}
+<div id="nav" style="overflow:hidden;">
+  <div class="w3-sidebar w3-bar-block w3-collapse w3-right w3-card w3-animate-right w3-pale-green menu_width" style="height:100vh;overflow:scroll;position:absolute;right:0;top:0pt;" id="primary-nav">
+      <a href="javascript:void(0)" onclick="w3_close('primary-nav');w3_show('hamburger');" 
+        class="w3-button w3-bar-item w3-hide-large w3-text-grey">Close &times;</a>
+            <a class="w3-bar-item w3-button w3-border w3-hover-teal" href="/">Home</a>
+            <a class="w3-bar-item w3-button w3-border w3-hover-teal" href="{{ url_for('item.display')}}">Inventory Items</a>
+            <a class="w3-bar-item w3-button w3-border w3-hover-teal" href="{{ url_for('transaction.display')}}">Transactions</a>
+        {% if not g.user %}
+              <a class="w3-bar-item w3-button w3-border w3-hover-teal" href="{{ url_for('login.login')}}">Login</a>
+        {% else %}
+              <a class="w3-bar-item w3-button w3-border w3-hover-teal" href="{{ url_for('user.edit')}}" >Manage Your Profile</a>
+              <a class="w3-bar-item w3-button w3-border w3-hover-teal" href="{{ url_for('login.logout')}}">Logout</a>
+            {% if g.admin and g.admin.has_access(g.user)%}
+                <div style="display:none"><div style="display:none"><!-- just a place holder -->
+                {% for item in g.admin.permissions %}
+                    {% if g.admin.has_access(g.user,item['table'])%}
+                        {% if item['header_row'] == True %}
+                        </div></div>
+                        <div class="w3-dropdown-hover">
+                            <button class="w3-button w3-border w3-teal w3-greyscale w3-hover-opacity"><strong>{{item['display_name']}}</strong></button>
+                            <div class="w3-dropdown-content w3-card-4">
+                        {% else %}
+                            <a  class="w3-bar-item w3-button w3-border w3-light-gray w3-hover-teal" href="{{item['url']}}">{{item['display_name']}}</a>
                         {% endif %}
-                    </ul>
-                </div>
-            </div>
-        </div>
-        <p class="clear"></p>
+                    {% endif %}
+                {% endfor %}
+                    </div></div>
+            {% endif %} <!-- g.admin -->
+        {% endif %} <!-- g.user -->
+    </div>
 </div>

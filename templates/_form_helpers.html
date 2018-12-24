@@ -1,0 +1,63 @@
+{# Edit these to change the basic styling #}
+    {% macro label_color(req=False) %} {# background color #}
+    {% if req %}w3-pale-red {%else%}w3-pale-green {%endif%}
+    {% endmacro %}
+
+    {% macro label_text(req=False)%}
+    {% if req %}w3-text-pink{%else%}{%endif%}
+    {% endmacro %}
+
+{# Sample code to use... #}
+    {# from _form_helpers.html import input_field  #}
+    {# {{ input_field(rec.name,"name","Your Name",req=True) }} #}
+
+{% macro input_field(value,name,label="",type="text",class="",req=False,placeholder="",default="",extras="") %}
+{% if type!="hidden"%}
+<label class=" w3-block {{label_color(req)}} {{label_text(req)}}">
+    {{ get_label(label,name) }}
+    {% if req %}<em class="w3-small {{label_text(req)}}">(required)</em>{%endif%}
+</label>
+{% endif %}
+{% set baseclass = "w3-input" %}
+    {% if type=="radio" %}{% set baseclass = "w3-radio" %}{% elif type=="checkbox"%}{% set baseclass = "w3-check" %}{% endif %}
+    <input class="{{baseclass}} {{ class }}" type="{{type}}" name="{{ name }}" id="{{name}}"
+    {%if req %}required{%endif%} value="{{ value | default(default,True )}}" 
+    {% if placeholder%}placeholder="{{placeholder}}"{%endif%} {{extras | safe }} >
+{% endmacro %}
+
+{% macro select_field(name,label="",type="",class="",req=False,placeholder="",default="",extras="") %}
+<label class="w3-block {{ label_color(req)}} {{label_text(req)}}">{{ get_label(label,name) }}</label>
+<select name="{{name}}" class="w3-select {{class}}" {{extras | safe }}>
+{# Be sure to provide the closing </select> tag after inserting your <option> items #}
+{% endmacro %}
+
+{% macro _radio_input_element(value,name,type,class,extras) %}
+<input type="{{type}}"  class="{{class}}" name="{{name}}" value="{{value}}" {{extras | safe }}>
+{% endmacro %}
+
+{% macro _radio_label_element(name,label,req) %}
+<span class="w3-tag {{ label_color(req)}} {{label_text(req)}}">{{ get_label(label,name)}}</span>
+{% endmacro %}
+
+{% macro radio_field(value,name,label="",type="radio",class="",req=False,placeholder="",default="",extras="",right=False) %}
+{% set baseclass = 'w3-radio'%}
+{% if type == "checkbox"%}{% set baseclass = 'w3-check'%}{%endif%}
+{% set class = baseclass + " " + class %}
+{% if right %}
+    <label>{{ _radio_label_element(name,label,req)}}{{ _radio_input_element(value,name,type,class,extras) }}</label>
+{% else %}
+    <label>{{ _radio_input_element(value,name,type,class,extras) }}{{ _radio_label_element(name,label,req)}}</label>
+{% endif%}
+{%endmacro%}
+
+{% macro checkbox_field(value,name,label="",type="checkbox",class="",req=False,placeholder="",default="",extras="") %}
+{{radio_field(value,name,label,type,class,req,default,extras)}}
+{%endmacro%}
+
+{% macro label_only(label="Label",req=False)%}
+<label class="w3-block {{ label_color(req)}} {{label_text(req)}}">{{ get_label(label,'') }}</label>
+{%endmacro%}
+
+{% macro get_label(label,name) %}
+{% if label %}{{ label | safe }}{% else%}{{ name | replace("_"," ") | title }}{%endif%}
+{% endmacro %}

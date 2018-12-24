@@ -9,7 +9,7 @@ function updateImage(imageSource,imageID) {
 }
 
 function editFromList(editFormURL) {
-	setModal('dialog',true);
+	//setModal('dialog',true);
 	$('#modal-form-contain').show();
 	$('#modal-form').show();
 	$('#modal-form').load(editFormURL,function(data){modalFormSuccess(data);})

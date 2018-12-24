@@ -1,0 +1,67 @@
+{# Use this as a guide to creating a web form page #}
+
+
+{# The field macros above basically all have the same attributes available:                                 #}
+{#     input_field(value,name,label="",type="text",class="",req=False,placeholder="",default="",extras="")  #}
+{#                                                                                                          #}
+{#     * value = the value to display                                                                       #}
+{#     * name = the name of the field. will also be used as the id                                          #}
+{#     * label = the label to display along with the field. Omit to use title version of name               #}
+{#     * type = field type                                                                                  #}
+{#     * class = any additional css classes you want to apply to the input field itself                     #}
+{#     * req = Set to true to mark field as required                                                        #}
+{#     * placeholder = placeholder text                                                                     #}
+{#     * default = default value if value is empty or None                                                  #}
+{#     * extras = properties to add to the input statement such as 'checked="checked"' etc.                 #}
+{#                                                                                                          #}
+{#  radio_field and checkbox_field have their type set as you'd expect. placeholder and default             #}
+{#  are ignored if provided                                                                                 #}
+{#  radio and checkbox also have an optional arg 'right'. Set it to True to have the input appear           #}
+{#  to the right of the label instead of the left.                                                          #}
+{#                                                                                                          #}
+{#  select_field does not incude a 'value' param. providing one will cause an error.                        #}
+{#  select_field does not include the closing tag. Be sure to provide the closing </select>                 #}
+{#  tag after inserting your <option> items.                                                                #}
+{#  default, placeholder and type values are ignored if provided.                                           #}
+{#                                                                                                          #}
+{#  label_only has only two arguments, label and req. both are optional but of course label makes sense     #}
+
+
+{% extends "form_layout.html" %}
+
+{% from "_form_helpers.html" import input_field, select_field, radio_field, checkbox_field, label_only %}
+{% block fieldset %}
+<fieldset>
+    {# some example fields #}
+    <p>{{ input_field(rec.id,"id",type="hidden",default=0)}}</p>
+    <p>{{ input_field(rec.name,"name",req=True)}}</p>
+    <p>{{ input_field(rec.value,"value",req=True)}}</p>
+    <p>{{ input_field(rec.user_name,"user_name")}}</p>
+    <p>{{ input_field(rec.expires,"expire_marker",label="Expires",placeholder="Never")}}</p>
+    
+    {# a select element #}
+    <p>{{ select_field("roles_select","Role",extras='multiple size="5"', class="w3-border") }}
+            {% for role in roles %}
+                {% if role.name == "super" and "super" is not in session_roles %}
+                {% else %}
+                <option value="{{role.name}}" {% if role.name in user_roles %}selected="selected" {% endif %}>{{role.name}}</option>
+                {% endif %}
+            {% endfor %}
+        </select>
+    </p>
+        
+    {# inline radio button statements #}
+    <p>
+        {% set extras = "" %}
+        {% if rec.active ==1 %}{% set extras = ' checked="checked"' %}{% endif %}
+        {{ radio_field(1,"active","Active:",extras=extras ) }}
+        {% set extras = "" %}
+        {% if rec.active ==0 %}{% set extras = ' checked="checked"' %}{% endif %}
+        {{ radio_field(0,"active","Inactive:",extras=extras ) }}
+    </p>
+    
+    {# just a label to adorn your own items #}
+    <p>{{ label_only("Last Access:")}} {{rec.last_access|default('Never',True)}} (UTC)</p>
+    
+</fieldset>
+{% endblock fieldset %}

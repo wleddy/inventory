@@ -1,0 +1,22 @@
+{% extends "layout.html" %}
+{% block title %}{{ g.title }}{% endblock %}
+
+{% from "_layout_helpers.html" import left_column_spacer, form_column_class %}
+{% from "_form_helpers.html" import input_field, select_field, radio_field, checkbox_field, label_only %}
+
+{% block body %}
+{% if help %}
+<div class="w3-container">
+    {{ left_column_spacer() }}
+    <div class="w3-panel {{ form_column_class() }} w3-pale-green">{{ help|safe }}</div>
+</div>
+{% endif %}
+
+<div class="w3-container">
+    {{ left_column_spacer() }}
+    <form action="{{ g.editURL }}{{ rec.id|default('0',True)}}/" method=post class="entry {{ form_column_class() }}">
+		{% include "editFormButtons.html" %}
+        {% block fieldset %}{% endblock %}
+    </form>
+</div>
+{% endblock body %}

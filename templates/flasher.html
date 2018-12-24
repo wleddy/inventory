@@ -1,9 +1,16 @@
-{% with messages = get_flashed_messages() %} {% if messages %} 
-<div class="clear" id="flasher_contain">
-	{% for message in messages %} 
-	<p class="flash">
-		{{ message }}
-	</p>
-	{% endfor %} 
-</div>
-{% endif %} {% endwith %}
+{% with messages = get_flashed_messages() %} 
+    {% if messages %} 
+    <div id="flasher_contain">
+        <div class="w3-panel w3-topbar w3-pale-green w3-border-light-green" style="">
+            <button class="w3-button w3-light-green w3-right w3-hover-opacity" style="padding:0 .3em .1em .3em;" onclick="w3_close('flasher_contain')">&times;</button>
+            <p class="w3-tiny" style="margin:0">&nbsp;</p>
+    	{% for message in messages %} 
+        <div class="w3-panel w3-leftbar w3-pale-yellow w3-border-yellow" style="">
+        	<p class="flash">
+        		{{ message }}
+        	</p>
+        </div>
+    	{% endfor %} 
+    </div></div>
+    {% endif %}
+ {% endwith %}

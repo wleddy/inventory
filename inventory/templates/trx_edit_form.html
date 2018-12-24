@@ -1,6 +1,5 @@
 {# Form body for transaction editing #}
 
-<fieldset>
 	<input type=hidden name="id" value="{{rec.id|default('0',True )}}">
     {% if items and not current_item %}
     <select name="item_id">
@@ -11,8 +10,9 @@
     </select>
     {% else %}
 		<input type=hidden name="item_id" value="{{rec.item_id|default('0',True )}}">
-        <h3>{{current_item.name}}</h3>
+        <h3 class="w3-container w3-panel w3-teal">{{current_item.name}}</h3>
     {% endif %}
+<fieldset>
     <p><span>Qty:</span><input type="num" size="5" name="qty" required value="{{ rec.qty|default('',True )}}" />&nbsp;&nbsp;(+ to add, - to remove)</p>
     <p><span>Value:</span>
         <input type="num" size="5" name="value" value="{{ rec.value|default('0',True )|money}}" />
