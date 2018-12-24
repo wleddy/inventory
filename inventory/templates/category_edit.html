@@ -1,12 +1,11 @@
-{% extends "layout.html" %}
-{% block title %}Edit {{ g.title }}{% endblock %}
-{% block body %}
-	<h2>Edit {{ g.title }}</h2>	
-    <form action="{{ g.editURL }}{{ rec.id|default('0',True)}}/" method=post class="entry">
-		{% include "editFormButtons.html" %}
-        <fieldset>
-    		<input type=hidden name="id" value="{{rec.id|default('0',True )}}">
-            <p><span>Name:</span><input type="text" size="20" name="name" required value="{{ rec.name|default('',True )}}" /></p>
-        </fieldset>
-    </form>
-{% endblock body %}
+{% extends "form_layout.html" %}
+
+{% from "_form_helpers.html" import input_field, select_field, radio_field, checkbox_field, label_only %}
+{% block fieldset %}
+<fieldset>
+    {# some example fields #}
+    <p>{{ input_field(rec.id,"id",type="hidden",default=0)}}</p>
+    <p>{{ input_field(rec.name,"name",req=True)}}</p>
+</fieldset>
+{% endblock fieldset %}
+

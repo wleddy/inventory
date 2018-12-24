@@ -4,7 +4,7 @@
         class="w3-button w3-bar-item w3-hide-large w3-text-grey">Close &times;</a>
             <a class="w3-bar-item w3-button w3-border w3-hover-teal" href="/">Home</a>
             <a class="w3-bar-item w3-button w3-border w3-hover-teal" href="{{ url_for('item.display')}}">Inventory Items</a>
-            <a class="w3-bar-item w3-button w3-border w3-hover-teal" href="{{ url_for('transaction.display')}}">Transactions</a>
+            <a class="w3-bar-item w3-button w3-border w3-hover-teal" href="{{ url_for('item.stock_report')}}">Stock Report</a>
         {% if not g.user %}
               <a class="w3-bar-item w3-button w3-border w3-hover-teal" href="{{ url_for('login.login')}}">Login</a>
         {% else %}

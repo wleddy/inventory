@@ -3,38 +3,41 @@
 {% from "_form_helpers.html" import input_field, select_field, radio_field, checkbox_field, label_only %}
 
 {% block fieldset %}
-    <h4 class="w3-panel w3-teal" id="item-QOH">Quantity On Hand: <span id="item-QOH-value" >{{on_hand | default("0", True) }}</span></span></h4>
-    <div class="w3-col m1 l1">&nbsp;</div>
-<fieldset class="w3-col s12 m4 l4 w3-left">
-    <p>{{ input_field(rec.id,"id",type="hidden",default=0)}}</p>
-    <p>{{ input_field(rec.name,"name",req=True)}}</p>
-    <p>{{ input_field(rec.description,"description",req=True)}}</p>
-    <p>{{ input_field(rec.min_stock,"Minimum Stock")}}</p>
-    <p>{{ select_field("uom","Unit of Measure") }}
-            {% for role in roles %}
-                <option value="" ><em>None</em></option>
-                {% for uom in uoms %}
-                <option value="{{ uom.name }}" {% if rec.uom == uom.name %}selected{% endif %} >{{ uom.name}}</option>
+<h4 class="w3-panel w3-teal" id="item-QOH">Quantity On Hand: <span id="item-QOH-value" >{{on_hand | default("0", True) }}</span></span></h4>
+<div class="w3-col m1 l1">&nbsp;</div>
+<div class="w3-contain">
+    <fieldset class="w3-col s12 m4 l4 w3-left">
+        <p>{{ input_field(rec.id,"id",type="hidden",default=0)}}</p>
+        <p>{{ input_field(rec.name,"name",req=True)}}</p>
+        <p>{{ input_field(rec.description,"description")}}</p>
+        <p>{{ input_field(rec.min_stock,"Minimum Stock")}}</p>
+        <p>{{ select_field("uom","Unit of Measure") }}
+                    <option value="" ><em>None</em></option>
+                    {% for uom in uoms %}
+                    <option value="{{ uom.name }}" {% if rec.uom == uom.name %}selected{% endif %} >{{ uom.name}}</option>
+                    {% endfor %}
+            </select>
+        </p>
+        <p>{{ select_field("cat_id","Category", req=True) }}
+                {% if rec.cat_id == None or rec.cat_id < 1 %}
+                <option value="0" ><em>Select One...</em></option>
+                {% endif %}
+                {% for category in categories %}
+                <option value="{{ category.id }}" {% if rec.cat_id == category.id %}selected{% endif %} >{{ category.name}}</option>
                 {% endfor %}
-            {% endfor %}
-        </select>
-    </p>
-    <p>{{ select_field("cat_id","Category", req=True) }}
-            {% if rec.cat_id == None or rec.cat_id < 1 %}
-            <option value="0" ><em>Select One...</em></option>
-            {% endif %}
-            {% for category in categories %}
-            <option value="{{ category.id }}" {% if rec.cat_id == category.id %}selected{% endif %} >{{ category.name}}</option>
-            {% endfor %}
-        </select>
-    </p>
+            </select>
+        </p>
     
-</fieldset>
-<div class="w3-contain  w3-col s12 m5 l6">
-<div class="w3-panel w3-right">
-    <div id="trx_list" class="w3-panel w3-card-2">
+    </fieldset>
+</div>
+
+<div class="w3-col s12 m5 l6"  style="padding-left:1em;">
+<div class="w3-contain">
+    <div id="trx_list" class="w3-card-4">
         {{ transactionList | safe }}
     </div>
 </div>
 </div>
+
+<div w3-panel>&nbsp;</div>
 {% endblock fieldset %}

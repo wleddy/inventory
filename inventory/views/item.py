@@ -177,7 +177,7 @@ def stock_report():
     if not end_date:
         end_date = local_datetime_now().replace(month=12, day=31)
     
-    return render_template('item_report_input.html',start_date=start_date,end_date=end_date)
+    return render_template('reports/item_report_input.html',start_date=start_date,end_date=end_date)
     
 def validate_form():
     valid_form = True

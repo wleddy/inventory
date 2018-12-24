@@ -1,20 +1,25 @@
 {% extends "layout.html" %}
-{% block title %}{{ g.title }} List{% endblock %}
+{% block title %}{{ g.title }}{% endblock %}
 {% block body %}
-	<h2>{{g.title}} List</h2>
-      	<p id="addRecord"><a href="{{ g.editURL }}0/">Add a new {{ g.title }}</a></p>
+    <div class="w3-col m3 l3 w3-hide-small">&nbsp;</div>
+    <div class="w3-col s12 m6 l6">
+      	<p id="addRecord"><a href="{{ g.editURL }}0/">Add a new record</a></p>
 	{%if recs %}
-		<table class="datatable">
-		<tr>
+		<table class="datatable w3-table w3-striped w3-hoverable">
+		<tr class="w3-teal">
+			<th class="w3-hide-small">Id</th>
 			<th>Name</th>
 		</tr>
 		{% for rec in recs %}
 	    <tr>
-			<td style="min-width:100px;"><a href="{{ g.editURL }}{{ rec.id }}/">{{ rec.name }}</a></td>
+			<td onclick="window.location='{{ g.editURL }}{{rec.id}}/'" class="w3-hide-small">{{ rec.id }}</td>
+			<td onclick="window.location='{{ g.editURL }}{{rec.id}}/'">{{ rec.name }}</td>
 		</tr>
 		{% endfor %}
 	  </table>
   	{% else %}
-    	<p><em>No {{ g.title }}s here so far</em></p>
+    	<p><em>No records here so far</em></p>
 	{% endif %}
+    </div>
+    <div class="w3-panel">&nbsp;</div>
 {% endblock %}

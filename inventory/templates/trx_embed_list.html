@@ -1,17 +1,17 @@
-<p><a class="script-link" onclick="editFromList('{{url_for('transaction.edit_from_list')}}0/{{item_id}}/')">Add Transaction...</a></p>
+<p><a class="script-link" href="javascript:void(0)" onclick="editFromList('{{url_for('transaction.edit_from_list')}}0/{{item_id}}/')">Add Transaction...</a></p>
 {% if trxs %}
     <table class="w3-table w3-small">
     <tr class=w3-teal>
         <th>Date</th>
         <th>Qty</th>
-        <th class="w3-hide-small">Value</th>
+        <th class="w3-hide-medium w3-hide-small">Value</th>
         <th colspan="2">Actions</th>
     </tr>
     {% for trx in trxs %}
         <tr id="trx-{{trx.id}}">
             <td>{{trx.created | short_date_string }}</td>
             <td style="text-align:right;">{{trx.qty | money() }}</td>
-            <td  class="w3-hide-small" style="text-align:right;">{{ trx.value | money() }}</td>
+            <td  class="w3-hide-medium w3-hide-small" style="text-align:right;">{{ trx.value | money() }}</td>
             <td><span class="script-link" onclick="editFromList('{{ url_for('transaction.edit_from_list')}}{{ trx.id }}/','trx_list')">edit</span></td>
             <td><span class="script-link" onclick="$.ajaxSetup({'async' : false});deleteFromList('{{ url_for('transaction.delete_from_list')}}{{ trx.id }}/','trx-{{trx.id}}');update_stock_on_hand();">delete</span></td>
         </tr>

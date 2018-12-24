@@ -17,6 +17,7 @@ def setExits():
 @table_access_required(Category)
 def display():
     setExits()
+    g.title = "{} List".format(g.title)
     
     recs = Category(g.db).select()
 
@@ -29,6 +30,7 @@ def display():
 @table_access_required(Category)
 def edit(id=None):
     setExits()
+    g.title = "Edit {} Record".format(g.title)
     
     category = Category(g.db)
     
