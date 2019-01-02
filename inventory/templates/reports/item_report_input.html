@@ -7,7 +7,7 @@
             <fieldset>
                 <p><span style="font-weight:800;" >Report Start Date: </span><input type="date" size="30" name="start_date" required value="{{ start_date | iso_date_string }}" /></p>
                 <p><span style="font-weight:800;" >Report End Date: &nbsp;&nbsp;</span><input type="date" size="30" name="end_date" value="{{ end_date | iso_date_string }}" /></p>
-                <p><input class="w3-btn w3-ripple w3-teal w3-mobile w3-round-large w3-shadow" type="submit" name="submit" value="Report">&nbsp;&nbsp;<a href="{{ g.listURL }}">Done</a></p>
+                <p><input class="w3-btn w3-ripple w3-primary-color w3-mobile w3-round-large w3-shadow" type="submit" name="submit" value="Report">&nbsp;&nbsp;<a href="{{ g.listURL }}">Done</a></p>
             </fieldset>
         </form>
     </div>

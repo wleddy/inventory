@@ -10,7 +10,7 @@
     </select>
     {% else %}
 		<input type=hidden name="item_id" value="{{rec.item_id|default('0',True )}}">
-        <h3 class="w3-container w3-panel w3-teal">{{current_item.name}}</h3>
+        <h3 class="w3-container w3-panel w3-primary-color">{{current_item.name}}</h3>
     {% endif %}
 <fieldset>
     <p><span>Qty:</span><input type="num" size="5" name="qty" required value="{{ rec.qty|default('',True )}}" />&nbsp;&nbsp;(+ to add, - to remove)</p>
