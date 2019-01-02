@@ -1,7 +1,7 @@
 {% with messages = get_flashed_messages() %} 
     {% if messages %} 
     <div id="flasher_contain">
-        <div class="w3-panel w3-topbar w3-pale-green w3-border-light-green" style="">
+        <div class="w3-panel w3-topbar w3-secondary-color w3-border-light-green" style="">
             <button class="w3-button w3-light-green w3-right w3-hover-opacity" style="padding:0 .3em .1em .3em;" onclick="w3_close('flasher_contain')">&times;</button>
             <p class="w3-tiny" style="margin:0">&nbsp;</p>
     	{% for message in messages %} 

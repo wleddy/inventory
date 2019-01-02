@@ -1,30 +1,66 @@
 {% extends "layout.html" %}
-{% block title %}{{g.title}}{% endblock %}
+{% block title %}{{ g.title }}{% endblock %}
+
+{% from "_layout_helpers.html" import left_column_spacer, form_column_class %}
+{% from "_form_helpers.html" import input_field, select_field, radio_field, checkbox_field, label_only %}
+
 {% block body %}
+    {% if show_form %}
+        {% if rendered_html %}
+            {% set help = rendered_html %}
+        {% else %}
+            {%  set help = '<p>Please fill out the form below if you have something to say on the subject.</p>' %}
+        {% endif %}
+    
+        {% if help %}
+        <div class="w3-container">
+            {{ left_column_spacer() }}
+            <div class="w3-panel {{ form_column_class() }} w3-secondary-color">
+                {{ help|safe }}
+            </div>
+        </div>
+        {% endif %}
 
-<h2>Contact Us</h2>
-{% if rendered_html %}
-{{ rendered_html | safe()}}
-{% endif %}
+        <div class="w3-container">
+            {{ left_column_spacer() }}
+            <form action="{{ g.contactURL }}" method=post class="entry {{ form_column_class() }}">
+                <fieldset>
+                    <p>{{ input_field(context['name'],"name",req=True)}}</p>
+                    <p>{{ input_field(context['email'],"email",label="Email Address",req=True)}}</p>
+                    <p>{{ label_only("Question, Comment, Condemnation:",req=True)}}
+                        <textarea name="comment" rows="8" required style="width:100%;">{{ context['comment'] }}</textarea> 
+                     </p>
+                <div id='contact-quiz' class=" w3-panel">
+                    <p>
+                        {{ label_only("To prove you are an actual human, <strong>Please answer the following quiz</strong>:")}}
+                    </p>
+                    <p>Imagine that a plane crashed on the border between two countries. Rescuers arrive from both countries at the same 
+                        time.
+                    </p>
+                    <p>
+                        Where do they bury the survivors?<br>
+                        {{ radio_field("A","quiz_answer",label="A: In a cemetery")}}<br>
+                        {{ radio_field("B","quiz_answer",label="B: In a snow bank")}}<br>
+                        {{ radio_field("C","quiz_answer",label="C: You don't bury survivors")}}<br>
+                        {{ radio_field("D","quiz_answer",label="D: In a lake")}}<br>
+                        <em>(Hint: the answer is C)</em>
+                    </p>
+                </div>
 
-{% if show_form %}
-<p>Please fill out the form below if you have something to say on the subject.</p>
+                <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input class="w3-btn w3-primary-color w3-round-large" type="submit" value="Send">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="/">Cancel</a></p>
+                </fieldset>
+            </form>
+        </div>
 
-<form action="{{ g.contactURL }}" method="post" accept-charset="utf-8">
-    <fieldset>
-        <p><span>Name</span><input type="text" size="50" name="name" required value="{{ context['name']}}" id="name" /></p>
-        <p><span>Email Address</span><input type="text" size="50" required name="email" value="{{ context['email']}}" id="email" /></p>
-        <p><span>Question, Comment, Condemnation:</span></p>
-        <textarea name="comment" rows="8" cols="40" required >{{ context['comment'] }}</textarea>        
-    </fieldset>
-
-    <p><input type="submit" value="Send">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="/">Cancel</a></p>
-</form>
-{% else %}
-<p>Thanks for your comments. We'll get back to you soon.</p>
-
-<p><a href="/">Return to the home page</a></p>
-
-{% endif %}
-
-{% endblock body%}
+    {% else %}
+            <div class="w3-container w3-panel">
+                {% if passed_quiz %}
+                <p>Thanks for your comments. We'll get back to you soon.</p>
+                <p><a href="/">Return to the home page</a></p>
+                {% else %}
+                <p>Sorry. I can't deliver your message you did not answer the quiz correctly.</p>
+                <p><a href="{{ url_for('.contact')}}">Return to the contact page</a></p>
+                {% endif %}
+            </div>
+    {% endif %}
+{% endblock body %}

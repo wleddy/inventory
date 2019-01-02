@@ -5,20 +5,37 @@
 ## ALL CONFIG NAMES MUST BE UPPERCASE!  ##
 
 # The basics...
-#SERVER_NAME = "example.com" # this has to be a real host name
-HOST_NAME = 'localhost:5000' # this should usually be SERVER_NAME
+HOST_NAME = 'localhost:5000' 
 SITE_NAME = "My New Web Site"
 DEBUG = True
-TESTING = DEBUG
 
-REQUIRE_SSL = (not DEBUG)
-REPORT_404_ERRORS = DEBUG
+############################################
+### You Must ABSOLUTELY change this key
+############################################
+SECRET_KEY = "somereallylongstringtouseasakey"
+
+## Email Sending...
+MAIL_SERVER = 'localhost'
+MAIL_PORT = 465
+MAIL_USE_SSL = True
+MAIL_USERNAME = ""
+MAIL_PASSWORD = ""
+
+MAIL_DEFAULT_SENDER = "Some Name"
+MAIL_DEFAULT_ADDR = "admin@example.com"
 
 CONTACT_EMAIL_ADDR = "admin@example.com"
 CONTACT_NAME = "Some Name"
+CC_ADMIN_ON_CONTACT = True
 
+REPORT_404_ERRORS = DEBUG
+
+# Security Settings
+REQUIRE_SSL = (not DEBUG)
 
 # Timezone setting
+# This is the Time zone where you think you are,
+# in case the server is in a different time zone.
 # Un-comment one or add yours
 # for full list see pytz.all_timezones
 
@@ -27,36 +44,34 @@ TIME_ZONE = 'US/Pacific'
 #TIME_ZONE = 'US/Central'
 #TIME_ZONE = 'US/Eastern'
 
-HOST_PROTOCOL = "http"
-if REQUIRE_SSL:
-    HOST_PROTOCOL = "https"
-
-CGI_ROOT_FIX_APPLY = False # Some webservers mess up the root url
-CGI_ROOT_FIX_PATH = "/" #this is usually correct path
-
-SECRET_KEY = "somereallylongstringtouseasakey"
-
-# set session expiration in seconds
-PERMANENT_SESSION_LIFETIME = 60*20
-
 # You can change database to another name if you like.
 DATABASE_NAME= "database.sqlite"
 DATABASE_PATH= 'instance/' + DATABASE_NAME
 
-## Email Sending...
-#MAIL_SERVER = 'localhost'
-#MAIL_PORT = 25 # or 465
-#MAIL_USE_SSL = False
-#MAIL_USERNAME = ""
-#MAIL_PASSWORD = ""
-#MAIL_DEFAULT_SENDER = ""
-#MAIL_DEFAULT_EMAIL = MAIL_USERNAME
+#############################################
+### These settings are probably Ok...
+#############################################
+
+CGI_ROOT_FIX_APPLY = True # Some webservers mess up the root url
+CGI_ROOT_FIX_PATH = "/" #this is usually correct path
+
+if REQUIRE_SSL:
+    HOST_PROTOCOL = "https"
+else:
+    HOST_PROTOCOL = "http"
+
+# set session expiration in seconds
+PERMANENT_SESSION_LIFETIME = 60*20
 
 # Uploads ...
 MAX_CONTENT_LENGTH = 300000
 
 ## some administrative settings
 ALLOW_USERNAME_CHANGE = True
+ALLOW_USER_SIGNUP = True
+
+## Places to look for documentation:
+DOC_DIRECTORY_LIST = ['','docs','takeabeltof','takeabeltof/docs','users','users/docs',]
 
 #Map Box Settings...
 #MAPBOX_PROJECT_ID = ""
@@ -65,4 +80,13 @@ ALLOW_USERNAME_CHANGE = True
 # Sets the default location when creating a new location pin if geolocation is not available
 #LOCATION_DEFAULT_LNG = -121.74439430236818
 #LOCATION_DEFAULT_LAT = 38.54422161206573
+
+# You can locate some or all of your static files in another directory
+# The default static directory will be tried if not found here.
+LOCAL_STATIC_FOLDER = "resource/static"
+
+# A list of dictionaries of settings for sites that share this config and virtualenv
+SUB_DOMAIN_SETTINGS = [
+    {"host_name": HOST_NAME, "database_path": DATABASE_PATH, "time_zone": TIME_ZONE, "local_static_folder": LOCAL_STATIC_FOLDER, "contact_email_addr": CONTACT_EMAIL_ADDR, "contact_name": CONTACT_NAME},
+    ]
 

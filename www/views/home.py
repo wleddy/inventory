@@ -1,9 +1,10 @@
 from flask import request, session, g, redirect, url_for, abort, \
-     render_template, flash, Blueprint, Response
+     render_template, flash, Blueprint, Response, safe_join
 from users.admin import login_required, table_access_required
-from datetime import datetime
-import mistune # for Markdown rendering
+from takeabeltof.utils import render_markdown_for, printException, handle_request_error
+from takeabeltof.date_utils import datetime_as_string
 import os
+
 
 mod = Blueprint('www',__name__, template_folder='../templates', url_prefix='')
 
@@ -16,12 +17,9 @@ def setExits():
 
 @mod.route('/')
 def home():
-    if g.user:
-        return redirect("/items/")
-        
     setExits()
-
-    rendered_html = render_markdown_for(mod,'index.md')
+    g.suppress_page_header = True
+    rendered_html = render_markdown_for('index.md',mod)
 
     return render_template('markdown.html',rendered_html=rendered_html,)
 
@@ -32,7 +30,7 @@ def about():
     setExits()
     g.title = "About"
     
-    rendered_html = render_markdown_for(mod,'about.md')
+    rendered_html = render_markdown_for('about.md',mod)
             
     return render_template('markdown.html',rendered_html=rendered_html)
 
@@ -41,35 +39,118 @@ def about():
 @mod.route('/contact/', methods=['POST', 'GET',])
 def contact():
     setExits()
-    g.name = 'Contact Us'
+    g.title = 'Contact Us'
     from app import app
     from takeabeltof.mailer import send_message
-    rendered_html = render_markdown_for(mod,'contact.md')
+    rendered_html = render_markdown_for('contact.md',mod)
+    
     show_form = True
     context = {}
+    success = True
+    passed_quiz = False
+    mes = "No errors yet..."
     if request.form:
-        if request.form['name'] and request.form['email'] and request.form['comment']:
-            context['name'] = request.form['name']
-            context['email'] = request.form['email']
-            context['comment'] = request.form['comment']
-            context['date'] = datetime.now().isoformat(sep=" ")
-            print(context)
-            send_message(
-                None,
-                subject = "Comment from {}".format(app.config['SITE_NAME']),
-                html_template = "home/email/contact_email.html",
-                context = context,
-                reply_to = request.form['email'],
-            )
+        #import pdb;pdb.set_trace()
+        quiz_answer = request.form.get('quiz_answer',"A")
+        if quiz_answer.upper() == "C":
+            passed_quiz = True
+        else:
+            flash("You did not answer the quiz correctly.")
+        if request.form['email'] and request.form['comment'] and passed_quiz:
+            context.update({'date':datetime_as_string()})
+            for key, value in request.form.items():
+                context.update({key:value})
+                
+            # get best contact email
+            to = []
+            # See if the contact info is in Prefs
+            try:
+                from users.views.pref import get_contact_email
+                contact_to = get_contact_email()
+                if contact_to:
+                    to.append(contact_to)
+            except Exception as e:
+                printException("Need to update home.contact to find contacts in prefs.","error",e)
+                
+            try:
+                admin_to = None
+                if not to:
+                    to = [(app.config['CONTACT_NAME'],app.config['CONTACT_EMAIL_ADDR'],),]
+                if app.config['CC_ADMIN_ON_CONTACT']:
+                    admin_to = (app.config['MAIL_DEFAULT_SENDER'],app.config['MAIL_DEFAULT_ADDR'],)
+                    
+                if admin_to:
+                    to.append(admin_to,)
+                
+            except KeyError as e:
+                mes = "Could not get email addresses."
+                mes = printException(mes,"error",e)
+                if to:
+                    #we have at least a to address, so continue
+                    pass
+                else:
+                    success = False
+                    
+            if success:
+                # Ok so far... Try to send
+                success, mes = send_message(
+                                    to,
+                                    subject = "Contact from {}".format(app.config['SITE_NAME']),
+                                    html_template = "home/email/contact_email.html",
+                                    context = context,
+                                    reply_to = request.form['email'],
+                                )
         
             show_form = False
         else:
             context = request.form
             flash('You left some stuff out.')
             
+    if success:
+        return render_template('contact.html',rendered_html=rendered_html, show_form=show_form, context=context,passed_quiz=passed_quiz)
+            
+    handle_request_error(mes,request,500)
+    flash(mes)
+    return render_template('500.html'), 500
     
-    return render_template('contact.html',rendered_html=rendered_html, show_form=show_form, context=context)
+@mod.route('/docs', methods=['GET',])
+@mod.route('/docs/', methods=['GET',])
+@mod.route('/docs/<path:filename>', methods=['GET',])
+def docs(filename=None):
+    setExits()
+    g.title = "Docs"
+    from app import get_app_config
+    app_config = get_app_config()
     
+    #import pdb;pdb.set_trace()
+    
+    file_exists = False
+    if not filename:
+        filename = "README.md"
+    else:
+        filename = filename.strip('/')
+        
+    # first try to get it as a (possibly) valid path
+    temp_path = os.path.join(os.path.dirname(os.path.abspath(__name__)),filename)
+    if not os.path.isfile(temp_path):
+        # try the default doc dir
+        temp_path = os.path.join(os.path.dirname(os.path.abspath(__name__)),'docs',filename)
+        
+    if not os.path.isfile(temp_path) and 'DOC_DIRECTORY_LIST' in app_config:
+        for path in app_config['DOC_DIRECTORY_LIST']:
+            temp_path = os.path.join(os.path.dirname(os.path.abspath(__name__)),path.strip('/'),filename)
+            if os.path.isfile(temp_path):
+                break
+            
+    filename = temp_path
+    file_exists = os.path.isfile(filename)
+            
+    if file_exists:
+        rendered_html = render_markdown_for(filename,mod)
+        return render_template('markdown.html',rendered_html=rendered_html)
+    else:
+        #file not found
+        abort(404)
     
 @mod.route('/robots.txt', methods=['GET',])
 def robots():
@@ -78,21 +159,3 @@ Disallow: /""" )
     resp.headers['content-type'] = 'text/plain'
     return resp
 
-
-def render_markdown_for(mod,file_name):
-    """Try to find the file to render and then do so"""
-    rendered_html = ''
-    # use similar search approach as flask templeting, root first, then local
-    # try to find the root templates directory
-    markdown_path = os.path.dirname(os.path.abspath(__name__)) + '/templates/{}'.format(file_name)
-    if not os.path.isfile(markdown_path):
-        # look in the templates directory of the calling blueprint
-        markdown_path = os.path.dirname(os.path.abspath(__file__)) + '/{}/{}'.format(mod.template_folder,file_name)
-    if os.path.isfile(markdown_path):
-        f = open(markdown_path)
-        rendered_html = f.read()
-        f.close()
-        rendered_html = mistune.markdown(rendered_html)
-
-    return rendered_html
-    

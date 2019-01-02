@@ -30,6 +30,18 @@ fi
 
 echo ""
 
+if [ ! -d "resource" ]
+then
+    echo 'create resource directory'
+    mkdir resource
+    touch resource/__init__.py
+    mkdir resource/static
+else
+    echo "###### a directory named 'resource' already exists #####"
+fi
+
+echo ""
+
 echo "Don't forget to update instance/site_settings.py before launching the app for the first time"
 
 

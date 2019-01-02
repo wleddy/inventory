@@ -8,13 +8,13 @@
 {% if help %}
 <div class="w3-container">
     {{ left_column_spacer() }}
-    <div class="w3-panel {{ form_column_class() }} w3-pale-green">{{ help|safe }}</div>
+    <div class="w3-panel {{ form_column_class() }} w3-secondary-color">{{ help|safe }}</div>
 </div>
 {% endif %}
 
 <div class="w3-container">
     {{ left_column_spacer() }}
-    <form action="{{ g.editURL }}{{ rec.id|default('0',True)}}/" method=post class="entry {{ form_column_class() }}">
+    <form action="{{ g.editURL }}" method=post class="entry {{ form_column_class() }}">
 		{% include "editFormButtons.html" %}
         {% block fieldset %}{% endblock %}
     </form>

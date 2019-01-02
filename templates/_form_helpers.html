@@ -1,10 +1,10 @@
 {# Edit these to change the basic styling #}
     {% macro label_color(req=False) %} {# background color #}
-    {% if req %}w3-pale-red {%else%}w3-pale-green {%endif%}
+    {% if req %}w3-label-req {%else%}w3-label-color {%endif%}
     {% endmacro %}
 
     {% macro label_text(req=False)%}
-    {% if req %}w3-text-pink{%else%}{%endif%}
+    {% if req %}w3-text-req{%else%}{%endif%}
     {% endmacro %}
 
 {# Sample code to use... #}

@@ -1,7 +1,7 @@
 <p class="form_button_row w3-contain w3-panel" >
-	<input type=submit class="w3-btn w3-ripple w3-teal w3-mobile w3-round-large w3-shadow" value=Save />&nbsp;&nbsp;
+	<input type=submit class="w3-btn w3-ripple w3-save-button-color w3-mobile w3-round-large w3-shadow" value=Save />&nbsp;&nbsp;
 	{% if rec.id and rec.id > 0 and (not no_delete or is_admin) and not g.cancelURL %}
-	<a id="form_delete_link"  class="w3-btn w3-ripple w3-deep-orange w3-mobile w3-round-large" href = "{{g.deleteURL}}{{rec.id}}/" onclick="return confirmRecordDelete();">Delete...</a>&nbsp;&nbsp;
+	<a id="form_delete_link"  class="w3-btn w3-ripple w3-delete-button-color w3-mobile w3-round-large" href = "{{g.deleteURL}}{{rec.id}}/" onclick="return confirmRecordDelete();">Delete...</a>&nbsp;&nbsp;
 	{% endif %}
-    <a  class="w3-btn w3-ripple w3-indigo w3-mobile w3-round-large" href="{% if g.cancelURL %}{{g.cancelURL}}{% else %}{{ g.listURL }}{% endif %}" >Cancel</a>
+    <a  class="w3-btn w3-ripple w3-cancel-button-color w3-mobile w3-round-large" href="{% if g.cancelURL %}{{g.cancelURL}}{% else %}{{ g.listURL }}{% endif %}" >Cancel</a>
 </p> 

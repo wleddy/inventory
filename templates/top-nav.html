@@ -1,15 +1,20 @@
 <div id="nav" style="overflow:hidden;">
-  <div class="w3-sidebar w3-bar-block w3-collapse w3-right w3-card w3-animate-right w3-pale-green menu_width" style="height:100vh;overflow:scroll;position:absolute;right:0;top:0pt;" id="primary-nav">
+  <div class="w3-sidebar w3-bar-block w3-collapse w3-right w3-card w3-animate-right w3-secondary-color menu_width" style="height:100vh;overflow:scroll;position:absolute;right:0;top:0pt;" id="primary-nav">
       <a href="javascript:void(0)" onclick="w3_close('primary-nav');w3_show('hamburger');" 
-        class="w3-button w3-bar-item w3-hide-large w3-text-grey">Close &times;</a>
-            <a class="w3-bar-item w3-button w3-border w3-hover-teal" href="/">Home</a>
-            <a class="w3-bar-item w3-button w3-border w3-hover-teal" href="{{ url_for('item.display')}}">Inventory Items</a>
-            <a class="w3-bar-item w3-button w3-border w3-hover-teal" href="{{ url_for('item.stock_report')}}">Stock Report</a>
+        class="w3-button w3-bar-item w3-hide-large w3-text-grey ">Close &times;</a>
+              <a class="w3-bar-item w3-button w3-border w3-secondary-color w3-primary-hover-color" href="/">Home</a>
+              <a class="w3-bar-item w3-button w3-border w3-hover-teal" href="{{ url_for('item.display')}}">Inventory Items</a>
+              <a class="w3-bar-item w3-button w3-border w3-hover-teal" href="{{ url_for('item.stock_report')}}">Stock Report</a>
+              <!--
+              <a class="w3-bar-item w3-button w3-border w3-secondary-color w3-primary-hover-color" href="{{ url_for('www.about')}}">About</a>
+              <a class="w3-bar-item w3-button w3-border w3-secondary-color w3-primary-hover-color" href="{{ url_for('www.contact')}}">Contact Us</a>
+              <a class="w3-bar-item w3-button w3-border w3-secondary-color w3-primary-hover-color" href="{{ url_for('www.docs')}}">Docs</a>
+              -->
         {% if not g.user %}
-              <a class="w3-bar-item w3-button w3-border w3-hover-teal" href="{{ url_for('login.login')}}">Login</a>
+              <a class="w3-bar-item w3-button w3-border w3-secondary-color w3-primary-hover-color" href="{{ url_for('login.login')}}">Login</a>
         {% else %}
-              <a class="w3-bar-item w3-button w3-border w3-hover-teal" href="{{ url_for('user.edit')}}" >Manage Your Profile</a>
-              <a class="w3-bar-item w3-button w3-border w3-hover-teal" href="{{ url_for('login.logout')}}">Logout</a>
+              <a class="w3-bar-item w3-button w3-border w3-secondary-color w3-primary-hover-color" href="{{ url_for('user.edit')}}" >Manage Your Profile</a>
+              <a class="w3-bar-item w3-button w3-border w3-secondary-color w3-primary-hover-color" href="{{ url_for('login.logout')}}">Logout</a>
             {% if g.admin and g.admin.has_access(g.user)%}
                 <div style="display:none"><div style="display:none"><!-- just a place holder -->
                 {% for item in g.admin.permissions %}
@@ -17,10 +22,10 @@
                         {% if item['header_row'] == True %}
                         </div></div>
                         <div class="w3-dropdown-hover">
-                            <button class="w3-button w3-border w3-teal w3-greyscale w3-hover-opacity"><strong>{{item['display_name']}}</strong></button>
+                            <button class="w3-button w3-border w3-drop-menu-section-color w3-drop-menu-section-hover-color"><strong>{{item['display_name']}}</strong></button>
                             <div class="w3-dropdown-content w3-card-4">
                         {% else %}
-                            <a  class="w3-bar-item w3-button w3-border w3-light-gray w3-hover-teal" href="{{item['url']}}">{{item['display_name']}}</a>
+                            <a  class="w3-bar-item w3-button w3-border w3-drop-menu-color w3-drop-menu-hover-color" href="{{item['url']}}">{{item['display_name']}}</a>
                         {% endif %}
                     {% endif %}
                 {% endfor %}
@@ -29,3 +34,5 @@
         {% endif %} <!-- g.user -->
     </div>
 </div>
+
+

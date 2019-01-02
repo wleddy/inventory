@@ -1,12 +1,12 @@
     {% if g.user or True%}
-<button id="hamburger" class="w3-button w3-xlarge  w3-hide-large w3-teal w3-hover-pale-green" style="position:fixed;top:3pt;right:6pt;" onclick="w3_open('primary-nav')">&#9776;</button>
-<div class="w3-container w3-teal w3-main menu_space" style="padding:2%;max-padding:12pt;">
+<button id="hamburger" class="w3-button w3-xlarge  w3-hide-large w3-primary-color w3-secondary-hover-color" style="position:fixed;top:3pt;right:6pt;" onclick="w3_open('primary-nav')">&#9776;</button>
+<div class="w3-container w3-primary-color w3-main menu_space" style="padding:2%;max-padding:12pt;">
     {% else %}
-<div class="w3-container w3-teal w3-main" style="padding:2%;max-padding:12pt">
+<div class="w3-container w3-primary-color w3-main" style="padding:2%;max-padding:12pt">
     {% endif %}
     <div class="w3-quarter w3-hide-small" style="max-width:120pt;">
         <a id="header_home" href="/">
-              <img style="width:100%;max-width:120pt;max-height:80pt;object-fit: scale-down;" id="headerlogo" src="{{ url_for('static_instance', filename='images/header-logo.jpg') }}" />
+              <img style="width:100%;max-width:120pt;max-height:80pt;object-fit: scale-down;" id="headerlogo" src="{{ url_for('static', filename='images/header-logo.jpg') }}" />
         </a>
     </div>
     <div class="w3-container w3-threequarter">
