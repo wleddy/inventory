@@ -21,6 +21,14 @@
 
 /*p {margin-top:0;margin-bottom:.4em;}*/
 
+/*
+pre {
+    overflow-x: scroll;
+}
+
+*/
+
+
 /* colors */
 /* Teal & pale green */
 /*
@@ -30,25 +38,34 @@
 .w3-secondary-color,.w3-secondary-hover-color:hover,.w3-drop-menu-color,
 .w3-label-color,.w3-label-hover-color:hover
 {color:#000!important;background-color:#ddffdd!important}
+.w3-primary-border-color,.w3-primary-hover-border-color:hover{border-color:#009688!important}
+.w3-secondary-border-color,.w3-secondary-hover-border-color:hover{border-color:#ddffdd!important}
 */
 
 /* amber and sand */
-/*.w3-primary-color,.w3-primary-hover-color:hover,
+/*
+.w3-primary-color,.w3-primary-hover-color:hover,
 .w3-drop-menu-section-color,.w3-drop-menu-section-color:hover,.w3-drop-menu-hover-color:hover
 {color:#000!important;background-color:#ffc107!important}
 .w3-secondary-color,.w3-secondary-hover-color:hover,.w3-drop-menu-color,
 .w3-label-color,.w3-label-hover-color:hover
 {color:#000!important;background-color:#fdf5e6!important}
+.w3-primary-border-color,.w3-primary-hover-border-color:hover{border-color:#ffc107!important}
+.w3-secondary-border-color,.w3-secondary-hover-border-color:hover{border-color:#fdf5e6!important}
 */
 
 /* indigo and blue */
-/*.w3-primary-color,.w3-primary-hover-color:hover,
+/*
+.w3-primary-color,.w3-primary-hover-color:hover,
 .w3-drop-menu-section-color,.w3-drop-menu-section-color:hover,.w3-drop-menu-hover-color:hover
 {color:#fff!important;background-color:#3f51b5!important}
 .w3-secondary-color,.w3-secondary-hover-color:hover,.w3-drop-menu-color,
 .w3-label-color,.w3-label-hover-color:hover
 {color:#000!important;background-color:#ddffff!important}
+.w3-primary-border-color,.w3-primary-hover-border-color:hover{border-color:#3f51b5!important}
+.w3-secondary-border-color,.w3-secondary-hover-border-color:hover{border-color:#ddffff!important}
 */
+
 
 /* for field labels and buttons */
 /* required fields */

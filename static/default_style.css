@@ -19,6 +19,7 @@ pre {
     overflow-x: scroll;
 }
 
+
 /* colors */
 /* Teal & pale green */
 
@@ -28,6 +29,9 @@ pre {
 .w3-secondary-color,.w3-secondary-hover-color:hover,.w3-drop-menu-color,
 .w3-label-color,.w3-label-hover-color:hover
 {color:#000!important;background-color:#ddffdd!important}
+.w3-primary-border-color,.w3-primary-hover-border-color:hover{border-color:#009688!important}
+.w3-secondary-border-color,.w3-secondary-hover-border-color:hover{border-color:#ddffdd!important}
+
 
 /* amber and sand */
 /*
@@ -37,6 +41,8 @@ pre {
 .w3-secondary-color,.w3-secondary-hover-color:hover,.w3-drop-menu-color,
 .w3-label-color,.w3-label-hover-color:hover
 {color:#000!important;background-color:#fdf5e6!important}
+.w3-primary-border-color,.w3-primary-hover-border-color:hover{border-color:#ffc107!important}
+.w3-secondary-border-color,.w3-secondary-hover-border-color:hover{border-color:#fdf5e6!important}
 */
 
 /* indigo and blue */
@@ -47,7 +53,10 @@ pre {
 .w3-secondary-color,.w3-secondary-hover-color:hover,.w3-drop-menu-color,
 .w3-label-color,.w3-label-hover-color:hover
 {color:#000!important;background-color:#ddffff!important}
+.w3-primary-border-color,.w3-primary-hover-border-color:hover{border-color:#3f51b5!important}
+.w3-secondary-border-color,.w3-secondary-hover-border-color:hover{border-color:#ddffff!important}
 */
+
 
 /* for field labels and buttons */
 /* required fields */
