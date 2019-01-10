@@ -1,38 +1,38 @@
 from flask import request, session, g, redirect, url_for, abort, \
      render_template, flash, Blueprint, Response
-from users.admin import login_required, table_access_required
-from takeabeltof.utils import printException, cleanRecordID
+from shotglass2.users.admin import login_required, table_access_required
+from shotglass2.takeabeltof.utils import printException, cleanRecordID
 from inventory.models import Item, Category, Uom, Transaction
 
-mod = Blueprint('category',__name__, template_folder='../templates', url_prefix='/cat')
+mod = Blueprint('uom',__name__, template_folder='templates/inventory', static_folder='static/inventory', url_prefix='/uom')
 
 
 def setExits():
     g.listURL = url_for('.display')
     g.editURL = url_for('.edit')
     g.deleteURL = url_for('.delete')
-    g.title = 'Category'
+    g.title = 'Unit of Measure'
 
 @mod.route('/',methods=["GET",])
-@table_access_required(Category)
+@table_access_required(Uom)
 def display():
     setExits()
     g.title = "{} List".format(g.title)
     
-    recs = Category(g.db).select()
+    recs = Uom(g.db).select()
 
-    return render_template('category_list.html',recs=recs,)
+    return render_template('uom_list.html',recs=recs,)
     
     
 @mod.route('/edit',methods=["GET", "POST",])
 @mod.route('/edit/',methods=["GET", "POST",])
 @mod.route('/edit/<int:id>/',methods=["GET", "POST",])
-@table_access_required(Category)
+@table_access_required(Uom)
 def edit(id=None):
     setExits()
     g.title = "Edit {} Record".format(g.title)
     
-    category = Category(g.db)
+    uom = Uom(g.db)
     
     if request.form:
         id = request.form.get('id',None)
@@ -40,32 +40,32 @@ def edit(id=None):
     
     if id >= 0 and not request.form:
         if id == 0:
-            rec = category.new()
+            rec = uom.new()
         else:
-            rec = category.get(id)
+            rec = uom.get(id)
             
         if rec:
-            return render_template('category_edit.html',rec=rec)
+            return render_template('uom_edit.html',rec=rec)
         else:
             flash('Record not Found')
             
             
     if request.form:
         if not validate_form():
-            return render_template('category_edit.html', rec=request.form)
+            return render_template('uom_edit.html', rec=request.form)
             
         if id == 0:
-            rec = category.new()
+            rec = uom.new()
         else:
-            rec = category.get(id)
+            rec = uom.get(id)
         if rec:
-            category.update(rec,request.form)
-            category.save(rec)
+            uom.update(rec,request.form)
+            uom.save(rec)
             try:
                 g.db.commit()
             except Exception as e:
                 g.db.rollback()
-                flash(printException('Error attempting to save Category record',str(e)))
+                flash(printException('Error attempting to save Uom record',str(e)))
                 return redirect(g.listURL)
         else:
             flash('Record not Found')
@@ -77,7 +77,7 @@ def edit(id=None):
 @mod.route('/delete',methods=["GET", "POST",])
 @mod.route('/delete/',methods=["GET", "POST",])
 @mod.route('/delete/<int:id>/',methods=["GET", "POST",])
-@table_access_required(Category)
+@table_access_required(Uom)
 def delete(id=None):
     setExits()
     if id == None:
@@ -88,11 +88,11 @@ def delete(id=None):
         flash("That is not a valid record ID")
         return redirect(g.listURL)
         
-    rec = Category(g.db).get(id)
+    rec = Uom(g.db).get(id)
     if not rec:
         flash("Record not found")
     else:
-        Category(g.db).delete(rec.id)
+        Uom(g.db).delete(rec.id)
         g.db.commit()
         flash("Record Deleted")
         

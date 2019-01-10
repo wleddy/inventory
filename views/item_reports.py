@@ -2,8 +2,8 @@
 
 from inventory.models import Item, Category, Transaction
 from flask import Response,g
-from takeabeltof.date_utils import local_datetime_now
-from takeabeltof.jinja_filters import iso_date_string
+from shotglass2.takeabeltof.date_utils import local_datetime_now
+from shotglass2.takeabeltof.jinja_filters import iso_date_string
 from datetime import timedelta
 import csv
 from io import StringIO

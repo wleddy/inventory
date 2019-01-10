@@ -1,6 +1,6 @@
-from takeabeltof.database import Database, SqliteTable
-from takeabeltof.utils import cleanRecordID
-from takeabeltof.date_utils import local_datetime_now
+from shotglass2.takeabeltof.database import Database, SqliteTable
+from shotglass2.takeabeltof.utils import cleanRecordID
+from shotglass2.takeabeltof.date_utils import local_datetime_now
 from datetime import timedelta
 
 class Item(SqliteTable):

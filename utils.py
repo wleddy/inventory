@@ -1,5 +1,5 @@
 from flask import g
-from takeabeltof.utils import cleanRecordID
+from shotglass2.takeabeltof.utils import cleanRecordID
 
 """
 Some utility functions

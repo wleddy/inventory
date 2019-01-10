@@ -1,13 +1,13 @@
 from flask import request, session, g, redirect, url_for, abort, \
      render_template, flash, Blueprint, Response
-from users.admin import login_required, table_access_required
-from takeabeltof.utils import printException, cleanRecordID
-from takeabeltof.date_utils import local_datetime_now, getDatetimeFromString
+from shotglass2.users.admin import login_required, table_access_required
+from shotglass2.takeabeltof.utils import printException, cleanRecordID
+from shotglass2.takeabeltof.date_utils import local_datetime_now, getDatetimeFromString
 from inventory.models import Item, Category, Uom, Transaction
 from .item_reports import stock_on_hand_report
 from inventory.views.transaction import get_list_for_item
 
-mod = Blueprint('item',__name__, template_folder='../templates', url_prefix='/items')
+mod = Blueprint('item',__name__, template_folder='templates/inventory', static_folder='static/inventory', url_prefix='/items')
 
 
 def setExits():
