@@ -4,14 +4,10 @@ env/
 *.log
 *.sqlite
 instance/
-resource/
 __pycache__
 .pytest_cache
 .coverage
 passenger.py
 tmp/
 
-## The User repo has it's own master
-users/
-## Some required utils
-takeabeltof/
+shotglass2/
