@@ -1,6 +1,6 @@
 /*  styles to override default_style.css
 
-    Check the settings for LOCAL_STATIC_FOLDER and then
+    Check the settings for STATIC_DIRS and then
     copy this file to that location.
 
     Uncomment and or make changes to this file
