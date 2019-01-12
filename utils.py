@@ -24,7 +24,7 @@ def stock_on_hand(id=None):
             if soh >= rec.min_stock:
                 return soh
             else:
-                return "Min ({}) {}".format(rec.min_stock,soh)
+                return "{} Min ({})".format(soh,rec.min_stock)
                 
         return "- out of stock -"
 
