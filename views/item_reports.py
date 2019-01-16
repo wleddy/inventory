@@ -37,7 +37,7 @@ def stock_on_hand_report(start_date=None,end_date=None):
         output = StringIO()
         with output as csvfile:
             writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-            from app import get_app_config
+            from shotglass2.shotglass import get_app_config
             app_config = get_app_config()
             row = {fieldnames[0]: "{} Stock Report from {} thru {}".format(app_config["SITE_NAME"],iso_date_string(start_date),iso_date_string(end_date)) }
             writer.writerow(row)
