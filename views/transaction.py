@@ -222,7 +222,8 @@ def save_record(rec,err_list=[]):
         except Exception as e:
             g.db.rollback()
             err_list.append(printException('Error attempting to save Transaction record',str(e)))
-            return false
+            
+    return False
     
     
 def validate_form(rec):
