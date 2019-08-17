@@ -1,0 +1,11 @@
+{% extends "form_layout.html" %}
+
+{% from "_form_helpers.html" import input_field, select_field, radio_field, checkbox_field, label_only %}
+{% block fieldset %}
+<fieldset>
+    {# some example fields #}
+    <p>{{ input_field(rec.id,"id",type="hidden",default=0)}}</p>
+    <p>{{ input_field(rec.name,"name",req=True)}}</p>
+</fieldset>
+{% endblock fieldset %}
+

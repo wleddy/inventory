@@ -11,7 +11,7 @@ class Item(SqliteTable):
     def __init__(self,db_connection):
         super().__init__(db_connection)
         self.table_name = 'item'
-        self.order_by_col = 'name'
+        self.order_by_col = 'lower(name)'
         self.defaults = {'uom':"Ea.","min_stock":3}
         
     def create_table(self):
@@ -118,7 +118,7 @@ class Category(SqliteTable):
     def __init__(self,db_connection):
         super().__init__(db_connection)
         self.table_name = 'category'
-        self.order_by_col = 'name'
+        self.order_by_col = 'lower(name)'
         self.defaults = {}
 
     def create_table(self):
@@ -157,7 +157,10 @@ class Transaction(SqliteTable):
             value NUMBER, -- per uom
             note TEXT,
             item_id INT,
+            warehouse_id INT,
+            trx_type TEXT, -- Add, Remove, Transfer
             FOREIGN KEY (item_id) REFERENCES item(id) ON DELETE CASCADE
+            FOREIGN KEY (warehouse_id) REFERENCES warehouse(id) ON DELETE CASCADE
             """
         super().create_table(sql)
         
@@ -170,7 +173,7 @@ class Uom(SqliteTable):
     def __init__(self,db_connection):
         super().__init__(db_connection)
         self.table_name = 'uom'
-        self.order_by_col = 'name'
+        self.order_by_col = 'lower(name)'
         self.defaults = {}
 
     def create_table(self):
@@ -185,6 +188,30 @@ class Uom(SqliteTable):
         """Create the table and initialize data"""
         self.create_table()
             
+            
+class Warehouse(SqliteTable):
+    """
+        Places where stuff is stored
+    """
+
+    def __init__(self,db_connection):
+        super().__init__(db_connection)
+        self.table_name = 'warehouse'
+        self.order_by_col = 'lower(name)'
+        self.defaults = {}
+
+    def create_table(self):
+        """Define and create the table"""
+
+        sql = """
+            name TEXT,
+            """
+        super().create_table(sql)
+
+    def init_table(self):
+        """Create the table and initialize data"""
+        self.create_table()
+            
 
 def init_tables(db):
     Item(db).init_table()
@@ -192,3 +219,6 @@ def init_tables(db):
     Item(db).init_table()
     Uom(db).init_table()
     Transaction(db).init_table()
+    Warehouse(db).init_table()
+    
+    
