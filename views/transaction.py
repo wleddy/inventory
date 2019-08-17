@@ -1,10 +1,10 @@
 from flask import request, session, g, redirect, url_for, abort, \
      render_template, flash, Blueprint, Response
-from shotglass2.users.admin import login_required, table_access_required
+from inventory.models import Item, Category, Uom, Transaction, Warehouse
+from shotglass2.shotglass import get_site_config
 from shotglass2.takeabeltof.utils import printException, cleanRecordID
-from shotglass2.takeabeltof.date_utils import getDatetimeFromString
-from inventory.models import Item, Category, Uom, Transaction
-from shotglass2.takeabeltof.date_utils import local_datetime_now
+from shotglass2.takeabeltof.date_utils import getDatetimeFromString, local_datetime_now
+from shotglass2.users.admin import login_required, table_access_required
 
 mod = Blueprint('transaction',__name__, template_folder='templates/inventory', static_folder='static/inventory', url_prefix='/trx')
 
@@ -50,7 +50,8 @@ def edit_from_list(id=None,item_id=None):
     item_id=cleanRecordID(item_id)
     item_rec = None
     rec = None
-    
+    warehouses = Warehouse(g.db).select()
+    trx_types = get_site_config().get('trx_types',['Add','Remove','Transfer'])
     transaction = Transaction(g.db)
     trx_id = cleanRecordID(id)
     if trx_id > 0:
@@ -85,7 +86,7 @@ def edit_from_list(id=None,item_id=None):
         rec.item_id=item_id
         
             
-    return render_template('trx_edit_from_list.html',rec=rec,current_item=item_rec)
+    return render_template('trx_edit_from_list.html',rec=rec,current_item=item_rec,warehouses=warehouses,trx_types=trx_types)
     
 #@mod.route('/add_from_list/',methods=["GET", "POST",])
 #@mod.route('/add_from_list/<int:item_id>/',methods=["GET", "POST",])
@@ -220,9 +221,9 @@ def save_record(rec,err_list=[]):
             return True
             
         except Exception as e:
-            g.db.rollback()
             err_list.append(printException('Error attempting to save Transaction record',str(e)))
             
+    g.db.rollback()
     return False
     
     
@@ -241,26 +242,6 @@ def validate_form(rec):
         rec.created = createdDate
         
     
-    #Try to coerse qty to a number
-    rec.qty = request.form.get('qty','').strip()
-    if rec.qty =='':
-        flash('Quantity is required')
-        valid_form = False
-    else:
-        try:
-            rec.qty = float(rec.qty)
-            if rec.qty == 0:
-                flash('Quantity may not be 0')
-                valid_form = False
-                
-            #truncate qty if int
-            if rec.qty - int(rec.qty) == 0:
-                rec.qty = int(rec.qty)
-                
-        except ValueError as e:
-            flash('Could not convert Qty {} to a number'.format(rec.qty))
-            valid_form = False
-    
     # Value must be a number
     try:
         rec.value = float(request.form.get('value',0))
@@ -274,4 +255,43 @@ def validate_form(rec):
         flash("You must select an item to use with this transaction")
         valid_form = False
         
+    #Try to coerse qty to a number
+    rec.qty = request.form.get('qty','').strip()
+    if rec.qty =='':
+        flash('Quantity is required')
+        valid_form = False
+    elif valid_form:
+        try:
+            rec.qty = float(rec.qty)
+            if rec.qty == 0:
+                flash('Quantity may not be 0')
+                valid_form = False
+                
+            #truncate qty if int
+            if rec.qty - int(rec.qty) == 0:
+                rec.qty = int(rec.qty)
+                
+            # set the sign of qty based on trx_type
+            rec.qty = abs(rec.qty)
+            if rec.trx_type.lower() == 'remove':
+                rec.qty = rec.qty * -1
+            # if a transfer, remove from this warehouse and add to target warehouse
+            target_warehouse = Warehouse(g.db).get(request.form.get('target_warehouse_id',-1))
+            if rec.trx_type.lower() == 'transfer' and target_warehouse:
+                rec.qty = rec.qty * -1
+                transfer_target = Transaction(g.db).new()
+                Transaction(g.db).update(transfer_target,rec._asdict())
+                transfer_target.qty = abs(transfer_target.qty)
+                transfer_target.trx_type = 'Add'
+                transfer_target.warehouse_id = target_warehouse.id
+                transfer_target.note = 'Transfered from {} warehouse'.format(Warehouse(g.db).get(rec.warehouse_id))
+                Transaction(g.db).save(transfer_target) # don't commit here...
+            else:
+                valid_form = False
+                flash("You must select a destination warehouse")
+                
+        except ValueError as e:
+            flash('Could not convert Qty {} to a number'.format(rec.qty))
+            valid_form = False
+    
     return valid_form

@@ -1,4 +1,5 @@
 {# Form body for transaction editing #}
+{% from "_form_helpers.html" import input_field, select_field, radio_field, checkbox_field, label_only %}
 
 	<input type=hidden name="id" value="{{rec.id|default('0',True )}}">
     {% if items and not current_item %}
@@ -13,7 +14,42 @@
         <h3 class="w3-container w3-panel w3-primary-color">{{current_item.name}}</h3>
     {% endif %}
 <fieldset>
-    <p><span>Qty:</span><input type="num" size="5" name="qty" required value="{{ rec.qty|default('',True )}}" />&nbsp;&nbsp;(+ to add, - to remove)</p>
+    <p>
+        {{ select_field("trx_type","Transaction Type", id="trx_type", extras=" autofocus ") }}
+                {% for type in trx_types %}
+                <option value="{{ type }}" {% if rec.trx_type == type %}selected{% endif %} >{{ type }}</option>
+                {% endfor %}
+        </select>
+    </p>
+    <p><span>Qty:</span><input type="num" size="5" name="qty" required value="{{ rec.qty|default('0',True )}}" /></p>
+    <div id="normal-warehouse">
+        <p>
+            {{ select_field("warehouse_id","Warehouse") }}
+                    <option value="-1" ><em>None</em></option>
+                    {% for warehouse in warehouses %}
+                    <option value="{{ warehouse.id }}" {% if rec.warehouse_id == warehouse.id %}selected{% endif %} >{{ warehouse.name}}</option>
+                    {% endfor %}
+            </select>
+        </p>
+    </div>
+    <div class="w3-row" id="transfer-warehouse" style="display:none;">
+        <p class="w3-row w3-half">
+            {{ select_field("warehouse_id","Warehouse") }}
+                    <option value="-1" ><em>None</em></option>
+                    {% for warehouse in warehouses %}
+                    <option value="{{ warehouse.id }}" {% if rec.warehouse_id == warehouse.id %}selected{% endif %} >{{ warehouse.name}}</option>
+                    {% endfor %}
+            </select>
+        </p>
+        <p class="w3-row w3-half" style="padding-left:6pt;">
+            {{ select_field("target_warehouse_id","Transfer to warehouse") }}
+                    <option value="0" ><em>Select a destination</em></option>
+                    {% for warehouse in warehouses %}
+                    <option value="{{ warehouse.id }}" >{{ warehouse.name}}</option>
+                    {% endfor %}
+            </select>
+        </p>
+    </div>
     <p><span>Value:</span>
         <input type="num" size="5" name="value" value="{{ rec.value|default('0',True )|money}}" />
         {%if current_item.uom %}(per {{ current_item.uom }}){% endif %}
@@ -21,3 +57,18 @@
     <p><span>Date: </span><input type="date" size="20" required name="created" value="{{ rec.created|default('',True )|short_date_string}}" /></p>
     <p><span>Note: </span><input type="text" size="40" name="note"  value="{{ rec.note|default('',True)}}" /></p>
 </fieldset>
+
+<script>
+    function showTransferSelect(){
+        trxType = $('#trx_type').val().toLowerCase();
+        if (trxType == 'transfer'){
+            $('#normal-warehouse').hide();
+            $('#transfer-warehouse').show();
+        } else {
+            $('#normal-warehouse').show();
+            $('#transfer-warehouse').hide();
+        }
+    }
+    
+   $("#trx_type").change(showTransferSelect);showTransferSelect();
+</script>

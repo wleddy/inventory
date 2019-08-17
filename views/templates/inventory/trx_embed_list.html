@@ -4,16 +4,17 @@
     <tr class=w3-primary-color>
         <th>Date</th>
         <th>Qty</th>
+        <th>Type</th>
         <th class="w3-hide-medium w3-hide-small">Value</th>
-        <th colspan="2">Actions</th>
+        <th>Actions</th>
     </tr>
     {% for trx in trxs %}
         <tr id="trx-{{trx.id}}">
-            <td>{{trx.created | short_date_string }}</td>
-            <td style="text-align:right;">{{trx.qty | money() }}</td>
-            <td  class="w3-hide-medium w3-hide-small" style="text-align:right;">{{ trx.value | money() }}</td>
-            <td><span class="script-link" onclick="editFromList('{{ url_for('transaction.edit_from_list')}}{{ trx.id }}/','trx_list')">edit</span></td>
-            <td><span class="script-link" onclick="$.ajaxSetup({'async' : false});deleteFromList('{{ url_for('transaction.delete_from_list')}}{{ trx.id }}/','trx-{{trx.id}}');update_stock_on_hand();">delete</span></td>
+            <td style="vertical-align:middle;">{{trx.created | short_date_string }}</td>
+            <td style="text-align:right;vertical-align:middle;">{{trx.qty | money() }}</td>
+            <td style="vertical-align:middle;" >{{ trx.trx_type }}</td>
+            <td  class="w3-hide-medium w3-hide-small" style="text-align:right;vertical-align:middle;">{{ trx.value | money() }}</td>
+            <td><span class="w3-btn w3-ripple w3-primary-color w3-mobile w3-round-large" onclick="editFromList('{{ url_for('transaction.edit_from_list')}}{{ trx.id }}/','trx_list')">Edit</span></td>
         </tr>
     {% endfor%}
     </table>
