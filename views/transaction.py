@@ -276,19 +276,21 @@ def validate_form(rec):
             if rec.trx_type.lower() == 'remove':
                 rec.qty = rec.qty * -1
             # if a transfer, remove from this warehouse and add to target warehouse
+            #import pdb;pdb.set_trace()
             target_warehouse = Warehouse(g.db).get(request.form.get('target_warehouse_id',-1))
-            if rec.trx_type.lower() == 'transfer' and target_warehouse:
-                rec.qty = rec.qty * -1
-                transfer_target = Transaction(g.db).new()
-                Transaction(g.db).update(transfer_target,rec._asdict())
-                transfer_target.qty = abs(transfer_target.qty)
-                transfer_target.trx_type = 'Add'
-                transfer_target.warehouse_id = target_warehouse.id
-                transfer_target.note = 'Transfered from {} warehouse'.format(Warehouse(g.db).get(rec.warehouse_id))
-                Transaction(g.db).save(transfer_target) # don't commit here...
-            else:
-                valid_form = False
-                flash("You must select a destination warehouse")
+            if rec.trx_type.lower() == 'transfer':
+                if target_warehouse:
+                    rec.qty = rec.qty * -1
+                    transfer_target = Transaction(g.db).new()
+                    Transaction(g.db).update(transfer_target,rec._asdict())
+                    transfer_target.qty = abs(transfer_target.qty)
+                    transfer_target.trx_type = 'Add'
+                    transfer_target.warehouse_id = target_warehouse.id
+                    transfer_target.note = 'Transfered from {} warehouse'.format(Warehouse(g.db).get(rec.warehouse_id))
+                    Transaction(g.db).save(transfer_target) # don't commit here...
+                else:
+                    valid_form = False
+                    flash("You must select a destination warehouse")
                 
         except ValueError as e:
             flash('Could not convert Qty {} to a number'.format(rec.qty))
