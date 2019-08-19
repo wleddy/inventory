@@ -1,5 +1,15 @@
 .bail on
 
+CREATE TABLE IF NOT EXISTS 'warehouse' (
+            'id' INTEGER NOT NULL PRIMARY KEY,
+            name TEXT);
+            
+insert into warehouse (name) values ("New Warehouse");
+
+-- do this so insert from select will work (match columns)
+alter table trx add column warehouse_id INT;
+alter table trx add column trx_type TEXT;
+
 CREATE TABLE IF NOT EXISTS 'trx_new' (
             'id' INTEGER NOT NULL PRIMARY KEY,
             created DATETIME,
@@ -18,5 +28,7 @@ drop table trx;
 alter table trx_new rename to trx;
 update trx set trx_type = 'Add' where trx.qty > 0;
 update trx set trx_type = 'Remove' where trx.qty < 0;
+update trx set warehouse_id = 1;
+    
 
 .bail off
