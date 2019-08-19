@@ -51,7 +51,7 @@ def edit_from_list(id=None,item_id=None):
     item_rec = None
     rec = None
     warehouses = Warehouse(g.db).select()
-    trx_types = get_site_config().get('trx_types',['Add','Remove','Transfer'])
+    trx_types = get_site_config().get('trx_types',['Add','Remove',])
     transaction = Transaction(g.db)
     trx_id = cleanRecordID(id)
     if trx_id > 0:
@@ -260,40 +260,23 @@ def validate_form(rec):
     if rec.qty =='':
         flash('Quantity is required')
         valid_form = False
-    elif valid_form:
-        try:
-            rec.qty = float(rec.qty)
-            if rec.qty == 0:
-                flash('Quantity may not be 0')
-                valid_form = False
-                
-            #truncate qty if int
-            if rec.qty - int(rec.qty) == 0:
-                rec.qty = int(rec.qty)
-                
-            # set the sign of qty based on trx_type
-            rec.qty = abs(rec.qty)
-            if rec.trx_type.lower() == 'remove':
-                rec.qty = rec.qty * -1
-            # if a transfer, remove from this warehouse and add to target warehouse
-            #import pdb;pdb.set_trace()
-            target_warehouse = Warehouse(g.db).get(request.form.get('target_warehouse_id',-1))
-            if rec.trx_type.lower() == 'transfer':
-                if target_warehouse:
-                    rec.qty = rec.qty * -1
-                    transfer_target = Transaction(g.db).new()
-                    Transaction(g.db).update(transfer_target,rec._asdict())
-                    transfer_target.qty = abs(transfer_target.qty)
-                    transfer_target.trx_type = 'Add'
-                    transfer_target.warehouse_id = target_warehouse.id
-                    transfer_target.note = 'Transfered from {} warehouse'.format(Warehouse(g.db).get(rec.warehouse_id))
-                    Transaction(g.db).save(transfer_target) # don't commit here...
-                else:
-                    valid_form = False
-                    flash("You must select a destination warehouse")
-                
-        except ValueError as e:
-            flash('Could not convert Qty {} to a number'.format(rec.qty))
+        
+    if not Warehouse(g.db).get(request.form.get('warehouse_id',-1)):
+        flash("You must select a warehouse")
+        valid_form = False
+
+    try:
+        rec.qty = float(rec.qty)
+        if rec.qty == 0:
+            flash('Quantity may not be 0')
             valid_form = False
+            
+        #truncate qty if int
+        if rec.qty - int(rec.qty) == 0:
+            rec.qty = int(rec.qty)
+                       
+    except ValueError as e:
+        flash('Could not convert Qty {} to a number'.format(rec.qty))
+        valid_form = False
     
     return valid_form
