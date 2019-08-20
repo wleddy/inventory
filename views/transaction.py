@@ -230,15 +230,19 @@ def save_record(rec,err_list=[]):
 def validate_form(rec):
     valid_form = True
     datestring = request.form.get('created','').strip()
-    createdDate = getDatetimeFromString(datestring)
     if datestring == '':
         valid_form = False
         flash('Date may not be empty')
-        
-    if createdDate is None:
-        flash('Date is not in a known format ("mm/dd/yy")')
-        valid_form = False
     else:
+        createdDate = getDatetimeFromString(datestring)
+        if createdDate is None:
+            flash('Date is not in a known format ("mm/dd/yy")')
+            valid_form = False
+        elif createdDate > local_datetime_now():
+            flash("The date may not be in the future")
+            valid_form = False
+    
+    if valid_form:
         rec.created = createdDate
         
     
