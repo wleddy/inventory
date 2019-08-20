@@ -174,7 +174,24 @@ def get_list_for_item(item_id=None):
     item_id = cleanRecordID(item_id)
     trxs = None
     if item_id and item_id > 0:
-        trxs = Transaction(g.db).select(where='item_id = {}'.format(item_id))
+        where = 'item_id = {}'.format(item_id)
+        order_by = 'trx.created desc, trx.warehouse_id'
+        
+        sql = """SELECT 
+            trx.*, 
+            warehouse.name as warehouse_name, 
+            category.name as category_name
+            
+        FROM trx 
+        JOIN item on item.id = trx.item_id 
+        JOIN category on category.id = item.cat_id
+        JOIN warehouse on warehouse.id = trx.warehouse_id
+        WHERE {where}
+        ORDER BY {order_by}
+        """.format(where=where,order_by=order_by)
+        
+        
+        trxs = Transaction(g.db).query(sql)
         
     return render_template('trx_embed_list.html',trxs=trxs,item_id=item_id)
     
