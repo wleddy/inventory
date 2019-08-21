@@ -31,10 +31,11 @@ def stock_on_hand_report(start_date=None,end_date=None,warehouse=-1):
             
                 from item
                 left join trx on trx.item_id = item.id
-                join warehouse as wares on wares.id = trx.warehouse_id
+                left join warehouse as wares on wares.id = trx.warehouse_id
                 join category as cats on cats.id = item.cat_id
             
                 Where {where}
+                group by item.id
                 order by lower(category), item.name
         """.format(where=where)
         
