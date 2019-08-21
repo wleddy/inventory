@@ -21,7 +21,8 @@
 			<th class="w3-hide-small">Id</th>
 			<th>Name</th>
 			<th>Category</th>
-            <th class="">On Hand</th>
+            <th>On Hand</th>
+            <th>Cost</th>
 		</tr>
 		{% for rec in recs %}
 	    <tr>
@@ -29,6 +30,7 @@
 			<td onclick="window.location='{{ g.editURL }}{{rec.id}}/'">{{ rec.name }}</td>
 			<td onclick="window.location='{{ g.editURL }}{{rec.id}}/'">{{ rec.cat_id | category_name |default("- None -",true) }}</td>
 			<td onclick="window.location='{{ g.editURL }}{{rec.id}}/'" class="w3--small">{{ rec.id | stock_on_hand |default("0",true) }}</td>
+			<td onclick="window.location='{{ g.editURL }}{{rec.id}}/'" class="w3--small w3-right">{{ rec.id | lifo_cost |default("0",true) | money }}</td>
 		</tr>
 		{% endfor %}
 	  </table>

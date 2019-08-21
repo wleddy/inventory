@@ -1,5 +1,6 @@
 from flask import g
 from shotglass2.takeabeltof.utils import cleanRecordID
+from inventory.models import Item, Category
 
 """
 Some utility functions
@@ -16,7 +17,6 @@ def category_name(id=None):
         
 def stock_on_hand(id=None):
     """Return the stock count for the item.id else something else"""
-    from inventory.models import Item
     rec = Item(g.db).get(cleanRecordID(id))
     if rec:
         soh = Item(g.db).stock_on_hand(cleanRecordID(id))
@@ -27,8 +27,17 @@ def stock_on_hand(id=None):
                 return "{} Min ({})".format(soh,rec.min_stock)
                 
         return "- out of stock -"
+        
+        
+def lifo_cost(id=None):
+    """Return the LIFO cost as a string for item """
+    cost = Item(g.db).lifo_cost(cleanRecordID(id))
+    return str(cost)
 
 def register_inv_filters(app):
     # register the filters
     app.jinja_env.filters['category_name'] = category_name
     app.jinja_env.filters['stock_on_hand'] = stock_on_hand
+    app.jinja_env.filters['lifo_cost'] = lifo_cost
+    
+    
