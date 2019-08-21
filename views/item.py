@@ -3,7 +3,7 @@ from flask import request, session, g, redirect, url_for, abort, \
 from shotglass2.users.admin import login_required, table_access_required
 from shotglass2.takeabeltof.utils import printException, cleanRecordID
 from shotglass2.takeabeltof.date_utils import local_datetime_now, getDatetimeFromString
-from inventory.models import Item, Category, Uom, Transaction
+from inventory.models import Item, Category, Uom, Transaction, Warehouse
 from .item_reports import stock_on_hand_report
 from inventory.views.transaction import get_list_for_item
 
@@ -162,11 +162,13 @@ def stock_report():
     g.title = "Inventory Stock Report"
     start_date = None
     end_date = None
+    warehouses = Warehouse(g.db).select()
     if request.form:
         start_date = getDatetimeFromString(request.form.get("start_date",None))
         end_date = getDatetimeFromString(request.form.get("end_date",None))
+        warehouse_id = request.form.get('warehouse_id','-1')
         if start_date and end_date and start_date < end_date:
-            return stock_on_hand_report(start_date,end_date)
+            return stock_on_hand_report(start_date,end_date,warehouse_id)
         else:
             start_date = request.form['start_date']
             end_date = request.form['end_date']
@@ -177,7 +179,7 @@ def stock_report():
     if not end_date:
         end_date = local_datetime_now().replace(month=12, day=31)
     
-    return render_template('reports/item_report_input.html',start_date=start_date,end_date=end_date)
+    return render_template('reports/item_report_input.html',start_date=start_date,end_date=end_date,warehouses=warehouses)
     
 def validate_form():
     valid_form = True

@@ -49,41 +49,62 @@ class Item(SqliteTable):
         # else do a normal select
         return super()._select_sql(**kwargs)
 
-    def stock_on_hand(self,id,end_date=None):
+
+    def _get_warehouse_where(self,**kwargs):
+        """Return a snippet of sql to filter by warehouse_id"""
+
+        warehouse_id = cleanRecordID(kwargs.get('warehouse_id'))
+        warehouse_where = ''
+        if warehouse_id > 0:
+            warehouse_where = " and trx.warehouse_id = {} ".format(warehouse_id)
+            
+        return warehouse_where
+        
+    def stock_on_hand(self,id,end_date=None,**kwargs):
+        
+        #import pdb;pdb.set_trace()
+        warehouse_where = self._get_warehouse_where(**kwargs)
+            
         id = cleanRecordID(id)
         if end_date is None:
             end_date = local_datetime_now()
             
         sql = """select COALESCE(sum(qty), 0) as qty 
                 from trx where item_id = {}
-                and date(created) <= date("{}")
-                """.format(id,end_date)
+                and date(created) <= date("{}") {}
+                """.format(id,end_date,warehouse_where)
                 
         rec = self.db.execute(sql).fetchone()
         return self.handle_rec_value(rec,'qty')
         
-    def additions(self,id,start_date=None,end_date=None):
+    def additions(self,id,start_date=None,end_date=None,**kwargs):
+        
+        warehouse_where = self._get_warehouse_where(**kwargs)
+        
         id = cleanRecordID(id)
         #import pdb;pdb.set_trace()
         start_date,end_date = self.set_dates(start_date,end_date)
         sql = """select COALESCE(sum(qty), 0) as qty from trx where item_id = {} and qty > 0 
-        and date(created) >= date("{}") and date(created) <= date("{}")
-        """.format(id,start_date,end_date)
+        and date(created) >= date("{}") and date(created) <= date("{}") {}
+        """.format(id,start_date,end_date,warehouse_where)
         
         rec = self.db.execute(sql).fetchone()
         return self.handle_rec_value(rec,'qty')
         
-    def subtractions(self,id,start_date=None,end_date=None):
+    def subtractions(self,id,start_date=None,end_date=None,**kwargs):
+            
+        warehouse_where = self._get_warehouse_where(**kwargs)
+            
         id = cleanRecordID(id)
         start_date,end_date = self.set_dates(start_date,end_date)
         sql = """
             select COALESCE(sum(qty), 0) as qty from trx where item_id = {} and qty < 0
-            and date(created) >= date("{}") and date(created) <= date("{}")
-        """.format(id,start_date,end_date)
+            and date(created) >= date("{}") and date(created) <= date("{}") {}
+        """.format(id,start_date,end_date,warehouse_where)
         rec = self.db.execute(sql).fetchone()
         return self.handle_rec_value(rec,'qty')
         
-    def lifo_cost(self,id,start_date=None,end_date=None):
+    def lifo_cost(self,id,start_date=None,end_date=None,**kwargs):
         id = cleanRecordID(id)
         start_date,end_date = self.set_dates(start_date,end_date)
         sql = """
