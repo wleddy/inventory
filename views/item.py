@@ -11,12 +11,12 @@ mod = Blueprint('item',__name__, template_folder='templates/inventory', static_f
 
 
 def setExits():
-    g.listURL = url_for('.display')
-    g.editURL = url_for('.edit')
-    g.deleteURL = url_for('.delete')
+    g.listURL = url_for('item.display')
+    g.editURL = url_for('item.edit')
+    g.deleteURL = url_for('item.delete')
     g.title = 'Inventory Item'
-    g.stock_reportURL = url_for('.stock_report')
-    g.trxListFromItemURL = url_for('.transaction_list_for_item')
+    g.stock_reportURL = url_for('item.stock_report')
+    g.trxListFromItemURL = url_for('item.transaction_list_for_item')
 
 @mod.route('/',methods=["GET",])
 @table_access_required(Item)
