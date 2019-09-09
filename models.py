@@ -185,7 +185,54 @@ class Transaction(SqliteTable):
             """
         super().create_table(sql)
         
+class Transfer(SqliteTable):
+    """
+        Record item transfers from one warehouse to another
+    """
+
+    def __init__(self,db_connection):
+        super().__init__(db_connection)
+        self.table_name = 'transfer'
+        self.order_by_col = 'transfer_date DESC'
+        self.defaults = {}
+
+    def create_table(self):
+        """Define and create the table"""
+
+        sql = """
+            transfer_date DATETIME,
+            item_id INT,
+            warehouse_out_id INT,
+            warehouse_in_id INT,
+            -- will want to add a trigger here to reverse transfer_item records prior to delete
+            FOREIGN KEY (item_id) REFERENCES item(id) ON DELETE RESTRICT
+            """
+        super().create_table(sql)
         
+class TransferItem(SqliteTable):
+    """
+        Record how many of item is transfered.
+    """
+
+    def __init__(self,db_connection):
+        super().__init__(db_connection)
+        self.table_name = 'transfer_item'
+        self.order_by_col = 'id'
+        self.defaults = {}
+
+    def create_table(self):
+        """Define and create the table"""
+
+        sql = """
+            transfer_id,
+            trx_id INT,
+            transfer_qty NUMBER, -- May be negative
+            FOREIGN KEY (trx_id) REFERENCES trx(id) ON DELETE RESTRICT
+            FOREIGN KEY (transfer_id) REFERENCES transfer(id) ON DELETE RESTRICT
+            """
+        super().create_table(sql)
+
+
 class Uom(SqliteTable):
     """
         Unit of Measure look up table
@@ -241,5 +288,7 @@ def init_tables(db):
     Uom(db).init_table()
     Transaction(db).init_table()
     Warehouse(db).init_table()
+    Transfer(db).init_table()
+    TransferItem(db).init_table()
     
     

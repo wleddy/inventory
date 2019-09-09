@@ -1,0 +1,9 @@
+{% extends "layout.html" %}
+{% block title %}Edit {{ g.title }}{% endblock %}
+{% block body %}
+	<h2>Edit {{ g.title }}</h2>	
+    <form action="{{ g.editURL }}{{ rec.id|default('0',True)}}/" method=post class="entry">
+		{% include "editFormButtons.html" %}
+        {% include "trx_edit_form.html" %}
+    </form>
+{% endblock body %}
