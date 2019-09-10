@@ -60,16 +60,12 @@ def edit_from_list(id=None,item_id=None):
         item_id = rec.item_id
     else:
         rec = transfer.new()
-        rec.created = local_datetime_now()
-        if 'last_tran' in session:
-            transfer.update(rec,session['last_tran'])
     
     # Handle Response?
     if request.form:
         #import pdb;pdb.set_trace()
-        error_list=[]
         transfer.update(rec,request.form)
-        if save_record(rec,error_list):
+        if save_record(rec):
             return "success" # the success function looks for this...
         else:
             pass
@@ -85,7 +81,7 @@ def edit_from_list(id=None,item_id=None):
         rec.item_id=item_id
         
             
-    return render_template('transaction_edit_from_list.html',rec=rec,current_item=item_rec,warehouses=warehouses,)
+    return render_template('transfer_edit_from_list.html',rec=rec,warehouses=warehouses,item=item_rec)
     
 #@mod.route('/add_from_list/',methods=["GET", "POST",])
 #@mod.route('/add_from_list/<int:item_id>/',methods=["GET", "POST",])
@@ -129,9 +125,6 @@ def edit(id=None):
     if id >= 0 and not request.form:
         if id == 0:
             rec = transfer.new()
-            rec.created = local_datetime_now()
-            if 'last_trans' in session:
-                transfer.update(rec,session['last_trans'])
         else:
             rec = transfer.get(id)
             
@@ -145,7 +138,6 @@ def edit(id=None):
                 
             
     elif request.form:
-        current_item = Item(g.db).get(cleanRecordID(request.form.get('item_id',"0")))
         if id == 0:
             rec = transfer.new()
         else:
@@ -155,8 +147,7 @@ def edit(id=None):
                 return redirect(g.listURL)
                 
         transfer.update(rec,request.form)
-        error_list = []
-        if save_record(rec,error_list):
+        if save_record(rec):
             return redirect(g.listURL)
         else:
             for err in error_list:
@@ -171,26 +162,26 @@ def edit(id=None):
 def get_list_for_item(item_id=None):
     """Render an html snippet of the transaciton list for the item"""
     item_id = cleanRecordID(item_id)
-    trans = None
+    recs = None
     if item_id and item_id > 0:
-        # where = 'item_id = {}'.format(item_id)
-        # order_by = 'trx.created desc, trx.warehouse_id'
-        #
-        # sql = """SELECT
-        #     transfer.*,
-        #
-        # FROM transfer
-        # JOIN item on item.id = transfer.item_id
-        # JOIN category on category.id = item.cat_id
-        # WHERE {where}
-        # ORDER BY {order_by}
-        # """.format(where=where,order_by=order_by)
-        #
-        # trxs = Transfer(g.db).query(sql)
-        
-        trans=Transfer.select(where='item_id = {}'.format(item_id))
-        
-    return render_template('transfer_embed_list.html',trans=trans,item_id=item_id)
+        where = 'transfer.item_id = {}'.format(item_id)
+
+        sql = """SELECT
+            transfer.*,
+            warehouse_out.name as warehouse_out_name,
+            warehouse_in.name as warehouse_in_name,
+            (select sum(transfer_qty) from transfer_item where transfer_item.transfer_qty > 0 and transfer_item.transfer_id = transfer.id) as transfer_qty
+            
+        FROM transfer
+        JOIN warehouse as warehouse_out on warehouse_out.id = transfer.warehouse_out_id
+        JOIN warehouse as warehouse_in on warehouse_in.id = transfer.warehouse_in_id
+        WHERE {where}
+        ORDER BY transfer.transfer_date DESC
+        """.format(where=where)
+        print(sql)
+        recs = Transfer(g.db).query(sql)
+                
+    return render_template('transfer_embed_list.html',recs=recs,item_id=item_id)
     
     
 @mod.route('/delete',methods=["GET", "POST",])
@@ -224,18 +215,19 @@ def handle_delete(id=None):
         return True
     
     
-def save_record(rec,err_list=[]):
+def save_record(rec):
     """Attempt to validate and save a record"""
     if validate_form(rec):
         Transfer(g.db).save(rec)
+        # Create the transfer_item records
+        
         try:
             g.db.commit()
             #Save the date and comment to session
-            session['last_trans'] = {"created":rec.created,"note":rec.note}
             return True
             
         except Exception as e:
-            err_list.append(printException('Error attempting to save Transfer record',str(e)))
+            flash(printException('Error attempting to save Transfer record',str(e)))
             
     g.db.rollback()
     return False

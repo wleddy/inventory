@@ -6,6 +6,7 @@ from shotglass2.takeabeltof.date_utils import local_datetime_now, getDatetimeFro
 from inventory.models import Item, Category, Uom, Transaction, Warehouse
 from .item_reports import stock_on_hand_report
 from inventory.views.transaction import get_list_for_item
+from inventory.views.transfer import get_list_for_item as get_transfers_for_item
 
 mod = Blueprint('item',__name__, template_folder='templates/inventory', static_folder='static/inventory', url_prefix='/items')
 
@@ -91,8 +92,12 @@ def edit(id=None):
             return redirect(g.listURL)
             
     transactionList = get_list_for_item(rec.id)
+    transferList = get_transfers_for_item(rec.id)
     
-    return render_template('item_edit.html',rec=rec,categories=categories,uoms=uoms,transactionList=transactionList,on_hand=on_hand)
+    return render_template('item_edit.html',rec=rec,categories=categories,uoms=uoms,
+                            transactionList=transactionList,
+                            transferList=transferList,
+                            on_hand=on_hand)
 
 @mod.route('/cancel',methods=["GET", "POST",])
 @mod.route('/cancel/',methods=["GET", "POST",])
