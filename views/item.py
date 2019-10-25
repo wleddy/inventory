@@ -6,7 +6,7 @@ from shotglass2.takeabeltof.date_utils import local_datetime_now, getDatetimeFro
 from inventory.models import Item, Category, Uom, Transaction, Warehouse
 from .item_reports import stock_on_hand_report
 from inventory.views.transaction import get_list_for_item
-from inventory.views.transfer import get_list_for_item as get_transfers_for_item
+from inventory.views.transfer import get_list_for_item as get_transfers_for_item 
 
 mod = Blueprint('item',__name__, template_folder='templates/inventory', static_folder='static/inventory', url_prefix='/items')
 
@@ -91,6 +91,8 @@ def edit(id=None):
             flash('Record not Found')
             return redirect(g.listURL)
             
+    from inventory.views.transaction import get_list_for_item
+    from inventory.views.transfer import get_list_for_item as get_transfers_for_item
     transactionList = get_list_for_item(rec.id)
     transferList = get_transfers_for_item(rec.id)
     
@@ -98,6 +100,21 @@ def edit(id=None):
                             transactionList=transactionList,
                             transferList=transferList,
                             on_hand=on_hand)
+                            
+                            
+@mod.route('/refresh_trx_lists',methods=["GET", "POST",])
+@mod.route('/refresh_trx_lists/',methods=["GET", "POST",])
+@mod.route('/refresh_trx_lists/<int:item_id>',methods=["GET", "POST",])
+@mod.route('/refresh_trx_lists/<int:item_id>/',methods=["GET", "POST",])
+@table_access_required(Item)
+def refresh_trx_lists(item_id=0):
+    #import pdb;pdb.set_trace()
+    item_id = cleanRecordID(item_id)
+    transactionList = get_list_for_item(item_id)
+    transferList = get_transfers_for_item(item_id)
+    
+    return render_template("trx_and_transfer_lists.html",transactionList=transactionList,transferList=transferList)
+    
 
 @mod.route('/cancel',methods=["GET", "POST",])
 @mod.route('/cancel/',methods=["GET", "POST",])

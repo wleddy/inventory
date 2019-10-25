@@ -5,23 +5,27 @@
 	<input type=hidden name="id" value="{{rec.id|default('0',True )}}">
 	<input type=hidden name="item_id" value="{{rec.item_id|default('0',True )}}">
     <h3 class="w3-container w3-panel w3-primary-color">Transfer {{item.name}}</h3>
-    <p><span>Transfer Qty:</span><input type="num" size="5" name="transfer_qty" required value="{{ transfer_qty |default('0',True )}}" /></p>
+    <div class="w3-row">
+        {% set transfer_date = rec.transfer_date | local_date_string %}
+        <p class="w3-col w3-half">{{ input_field(transfer_date,'transfer_date',placeholder='MM/DD/YY')}}</p>
+        <p class="w3-col w3-half" style="padding-left:3pt;">{{ input_field(rec.qty,'qty',default='0')}}</p>
+    </div>
     <div id="normal-warehouse">
         <p>
             {{ select_field("warehouse_out_id","From Warehouse") }}
                     <option value="-1">Select From Warehouse</option>
                     {% for warehouse in warehouses %}
-                    <option value="{{ warehouse.id }}" {% if rec.warehouse_out_id == warehouse.id %}selected{% endif %} >{{ warehouse.name}}</option>
+                    <option value="{{ warehouse.id }}" {% if warehouse_out_id == warehouse.id %}selected{% endif %} >{{ warehouse.name}}</option>
                     {% endfor %}
             </select>
         </p>
     </div>
     <div id="normal-warehouse">
         <p>
-            {{ select_field("warehouse_in_id","Receiving Warehouse") }}
+            {{ select_field("warehouse_in_id","Into Warehouse") }}
                     <option value="-1">Select Receiving Warehouse</option>
                     {% for warehouse in warehouses %}
-                    <option value="{{ warehouse.id }}" {% if rec.warehouse_in_id == warehouse.id %}selected{% endif %} >{{ warehouse.name}}</option>
+                    <option value="{{ warehouse.id }}" {% if warehouse_in_id == warehouse.id %}selected{% endif %} >{{ warehouse.name}}</option>
                     {% endfor %}
             </select>
         </p>

@@ -30,20 +30,10 @@
 </div>
 
 <div class="w3-col w3-hide-small w3-left" style='width:4%'>&nbsp;</div>
-<div class="w3-col s12 m5 l5">
-    <div class="w3-contain">
-        <div id="trx_list" class="w3-card-4">
-            <h3>Transactions</h3>
-            {{ transactionList | safe }}
-        </div>
-    </div>
-    <div class="w3-contain">
-        <div id="trx_list" class="w3-card-4">
-            <h3>Transfers</h3>
-            {{ transferList | safe }}
-        </div>
-    </div>
+<div  id="transactions_and_transfers">
+    {% include "trx_and_transfer_lists.html" %}
 </div>
+
 
 <div w3-panel>&nbsp;</div>
 {% endblock fieldset %}

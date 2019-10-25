@@ -61,6 +61,12 @@ class Item(SqliteTable):
         return warehouse_where
         
     def stock_on_hand(self,id,end_date=None,**kwargs):
+        """Return the quantity in inventory
+        Optional date range may be porvided.
+        
+        if "warehouse_id" is in kwargs, limit search to that warehouse
+        
+        """
         
         #import pdb;pdb.set_trace()
         warehouse_where = self._get_warehouse_where(**kwargs)
@@ -78,6 +84,12 @@ class Item(SqliteTable):
         return self.handle_rec_value(rec,'qty')
         
     def additions(self,id,start_date=None,end_date=None,**kwargs):
+        """Return the quantity of of product added to inventory
+        Optional date range may be porvided.
+        
+        if "warehouse_id" is in kwargs, limit search to that warehouse
+        
+        """
         
         warehouse_where = self._get_warehouse_where(**kwargs)
         
@@ -92,6 +104,12 @@ class Item(SqliteTable):
         return self.handle_rec_value(rec,'qty')
         
     def subtractions(self,id,start_date=None,end_date=None,**kwargs):
+        """Return the quantity of of product removed from inventory
+        Optional date range may be porvided.
+        
+        if "warehouse_id" is in kwargs, limit search to that warehouse
+        
+        """
             
         warehouse_where = self._get_warehouse_where(**kwargs)
             
@@ -105,6 +123,13 @@ class Item(SqliteTable):
         return self.handle_rec_value(rec,'qty')
         
     def lifo_cost(self,id,start_date=None,end_date=None,**kwargs):
+        """Return the LIFO cost for an item
+        Optional date range may be porvided.
+        
+        if "warehouse_id" is in kwargs, limit search to that warehouse
+        
+        """
+        
         id = cleanRecordID(id)
         start_date,end_date = self.set_dates(start_date,end_date)
         sql = """
@@ -193,7 +218,7 @@ class Transfer(SqliteTable):
     def __init__(self,db_connection):
         super().__init__(db_connection)
         self.table_name = 'transfer'
-        self.order_by_col = 'transfer_date DESC'
+        self.order_by_col = 'transfer_date'
         self.defaults = {}
 
     def create_table(self):
@@ -201,11 +226,13 @@ class Transfer(SqliteTable):
 
         sql = """
             transfer_date DATETIME,
+            qty NUMBER,
             item_id INT,
-            warehouse_out_id INT,
-            warehouse_in_id INT,
-            -- will want to add a trigger here to reverse transfer_item records prior to delete
-            FOREIGN KEY (item_id) REFERENCES item(id) ON DELETE RESTRICT
+            out_trx_id INT,
+            in_trx_id INT,
+            FOREIGN KEY (item_id) REFERENCES item(id) ON DELETE CASCADE
+            FOREIGN KEY (out_trx_id) REFERENCES trx(id) ON DELETE CASCADE
+            FOREIGN KEY (in_trx_id) REFERENCES trx(id) ON DELETE CASCADE
             """
         super().create_table(sql)
         
@@ -226,9 +253,8 @@ class TransferItem(SqliteTable):
         sql = """
             transfer_id,
             trx_id INT,
-            transfer_qty NUMBER, -- May be negative
-            FOREIGN KEY (trx_id) REFERENCES trx(id) ON DELETE RESTRICT
-            FOREIGN KEY (transfer_id) REFERENCES transfer(id) ON DELETE RESTRICT
+            FOREIGN KEY (trx_id) REFERENCES trx(id) ON DELETE CASCADE
+            FOREIGN KEY (transfer_id) REFERENCES transfer(id) ON DELETE CASCADE
             """
         super().create_table(sql)
 
@@ -289,6 +315,6 @@ def init_tables(db):
     Transaction(db).init_table()
     Warehouse(db).init_table()
     Transfer(db).init_table()
-    TransferItem(db).init_table()
+    #TransferItem(db).init_table()
     
     
