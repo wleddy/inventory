@@ -15,7 +15,7 @@
             {{ select_field("warehouse_out_id","From Warehouse") }}
                     <option value="-1">Select From Warehouse</option>
                     {% for warehouse in warehouses %}
-                    <option value="{{ warehouse.id }}" {% if warehouse_out_id == warehouse.id %}selected{% endif %} >{{ warehouse.name}}</option>
+                    <option value="{{ warehouse.id }}" {% if warehouse_out_id == warehouse.id %}selected{% endif %} >{{ warehouse.name}} Qty: {{ warehouse.qoh}}</option>
                     {% endfor %}
             </select>
         </p>
@@ -25,7 +25,7 @@
             {{ select_field("warehouse_in_id","Into Warehouse") }}
                     <option value="-1">Select Receiving Warehouse</option>
                     {% for warehouse in warehouses %}
-                    <option value="{{ warehouse.id }}" {% if warehouse_in_id == warehouse.id %}selected{% endif %} >{{ warehouse.name}}</option>
+                    <option value="{{ warehouse.id }}" {% if warehouse_in_id == warehouse.id %}selected{% endif %} >{{ warehouse.name}} Qty: {{ warehouse.qoh}}</option>
                     {% endfor %}
             </select>
         </p>

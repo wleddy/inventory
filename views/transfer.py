@@ -50,7 +50,7 @@ def edit_from_list(id=None,item_id=None):
     item_id=cleanRecordID(item_id)
     item_rec = None
     rec = None
-    warehouses = Warehouse(g.db).select()
+    warehouses = get_warehouse_dropdown(item_id)
     warehouse_in_id = cleanRecordID(request.form.get('warehouse_in_id',0))
     warehouse_out_id = cleanRecordID(request.form.get('warehouse_out_id',0))
     transfer = Transfer(g.db)
@@ -97,15 +97,7 @@ def edit_from_list(id=None,item_id=None):
             warehouse_in_id=warehouse_in_id,
             warehouse_out_id=warehouse_out_id,
             )
-    
-#@mod.route('/add_from_list/',methods=["GET", "POST",])
-#@mod.route('/add_from_list/<int:item_id>/',methods=["GET", "POST",])
-#@table_access_required(Transfer)
-#def add_from_list(item_id=None):
-#    import pdb;pdb.set_trace()
-#    
-#    return edit_from_list(0,item_id)
-        
+
     
 @mod.route('/delete_from_list/',methods=["GET", "POST",])
 @mod.route('/delete_from_list/<int:id>/',methods=["GET", "POST",])
@@ -362,3 +354,21 @@ def get_transfer_select(where):
             """.format(where=where)
             
     return sql
+    
+    
+def get_warehouse_dropdown(item_id=0):
+    """Return a list of dicts to be used in the transfer drop downs for warehouses"""
+    
+    out = []
+    recs = Warehouse(g.db).select()
+    if recs:
+        for rec in recs:
+            out.append(rec._asdict())
+            qoh = 0
+            if item_id:
+                qoh = Item(g.db).stock_on_hand(item_id,warehouse_id=rec.id)
+                
+            out[len(out)-1].update({'qoh':qoh})
+            
+    return out
+        
