@@ -88,20 +88,13 @@ def edit_from_list(id=None,item_id=None):
             
     return render_template('trx_edit_from_list.html',rec=rec,current_item=item_rec,warehouses=warehouses,trx_types=trx_types)
     
-#@mod.route('/add_from_list/',methods=["GET", "POST",])
-#@mod.route('/add_from_list/<int:item_id>/',methods=["GET", "POST",])
-#@table_access_required(Transaction)
-#def add_from_list(item_id=None):
-#    import pdb;pdb.set_trace()
-#    
-#    return edit_from_list(0,item_id)
-        
     
 @mod.route('/delete_from_list/',methods=["GET", "POST",])
 @mod.route('/delete_from_list/<int:id>/',methods=["GET", "POST",])
 @table_access_required(Transaction)
 def delete_from_list(id=None):
     setExits()
+    #import pdb;pdb.set_trace()
     if handle_delete(id):
         return "success"
 

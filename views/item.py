@@ -68,7 +68,6 @@ def edit(id=None):
             return redirect(g.listURL)
             
     #import pdb;pdb.set_trace()
-    on_hand = item.stock_on_hand(id)
                 
     if request.form:
         rec = item.get(id)
@@ -91,14 +90,17 @@ def edit(id=None):
             flash('Record not Found')
             return redirect(g.listURL)
             
-    from inventory.views.transaction import get_list_for_item
-    from inventory.views.transfer import get_list_for_item as get_transfers_for_item
+    # from inventory.views.transaction import get_list_for_item
+#     from inventory.views.transfer import get_list_for_item as get_transfers_for_item
     transactionList = get_list_for_item(rec.id)
     transferList = get_transfers_for_item(rec.id)
+    qoh_list = get_qoh_by_warehouse(rec.id)
+    on_hand = item.stock_on_hand(id)
     
     return render_template('item_edit.html',rec=rec,categories=categories,uoms=uoms,
                             transactionList=transactionList,
                             transferList=transferList,
+                            qoh_list = qoh_list,
                             on_hand=on_hand)
                             
                             
@@ -112,8 +114,10 @@ def refresh_trx_lists(item_id=0):
     item_id = cleanRecordID(item_id)
     transactionList = get_list_for_item(item_id)
     transferList = get_transfers_for_item(item_id)
+    qoh_list = get_qoh_by_warehouse(item_id)
+    on_hand = get_stock_on_hand(item_id)
     
-    return render_template("trx_and_transfer_lists.html",transactionList=transactionList,transferList=transferList)
+    return render_template("trx_and_transfer_lists.html",transactionList=transactionList,transferList=transferList,qoh_list=qoh_list,on_hand=on_hand)
     
 
 @mod.route('/cancel',methods=["GET", "POST",])
@@ -215,3 +219,24 @@ def validate_form():
         
     return valid_form
     
+    
+def get_qoh_by_warehouse(id):
+    """Return a list of namedlist with quantity on hand in each warehouse for the item id"""
+    
+    recs = []
+    id = cleanRecordID(id)
+    if id >0:
+        sql = """select COALESCE(sum(trx.qty), 0) as qty, warehouse.name 
+        from warehouse 
+        join item on item.id = trx.item_id 
+        left join trx on trx.warehouse_id = warehouse.id 
+        where item.id = {id}  
+        group by warehouse_id,item.id 
+        order by lower(warehouse.name)""".format(id=id)
+        
+        recs = Item(g.db).query(sql)
+        
+    else:
+        flash("Invalid item ID")
+        
+    return recs

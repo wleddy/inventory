@@ -1,5 +1,17 @@
 <div class="w3-col s12 m5 l5">
     <div class="w3-contain">
+        <div id="qoh_list" class="w3-card-4">
+            <h3>Quantity on Hand: {{ on_hand | default(0) }}</h3>
+            {% if qoh_list %}
+            {% for rec in qoh_list %}
+            <p>{{ rec.name }}: {{ rec.qty }}</p>
+            {% endfor %}
+            {% else %}
+            <p>No product on hand</p>
+            {% endif %}
+        </div>
+    </div>
+    <div class="w3-contain">
         <div id="trx_list" class="w3-card-4">
             <h3>Transactions</h3>
             {{ transactionList | safe }}

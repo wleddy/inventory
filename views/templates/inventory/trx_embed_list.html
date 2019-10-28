@@ -7,7 +7,7 @@
         <th>Type</th>
         <th>Warehouse</th>
         <th class="w3-hide-medium w3-hide-small">Value</th>
-        <th>Actions</th>
+        <th>&nbsp;</th>
     </tr>
     {% for trx in trxs %}
         <tr id="trx-{{trx.id}}">
@@ -16,7 +16,7 @@
             <td style="vertical-align:middle;" >{{ trx.trx_type }}</td>
             <td style="vertical-align:middle;" >{{ trx.warehouse_name }}</td>
             <td  class="w3-hide-medium w3-hide-small" style="text-align:right;vertical-align:middle;">{{ trx.value | money() }}</td>
-            <td><span class="w3-btn w3-ripple w3-primary-color w3-mobile w3-round-large" onclick="editFromList('{{ url_for('transaction.edit_from_list')}}{{ trx.id }}/','trx_list')">Edit</span></td>
+            <td><span class="w3-btn w3-ripple w3-primary-color w3-mobile w3-round-large" onclick="editFromList('{{ url_for('transaction.edit_from_list')}}{{ trx.id }}/','transactions_and_transfers')">Edit</span></td>
         </tr>
     {% endfor%}
     </table>
@@ -25,8 +25,8 @@
 {% endif %}
 
 <script type="text/javascript">
-    function update_stock_on_hand(){
-        $("#item-QOH-value").load("{{ url_for('item.get_stock_on_hand')}}{{item_id | default("0", True)}}/");
-    }
-    update_stock_on_hand();
+    // function update_stock_on_hand(){
+    //     $("#item-QOH-value").load("{{ url_for('item.get_stock_on_hand')}}{{item_id | default("0", True)}}/");
+    // }
+    // update_stock_on_hand();
 </script>
