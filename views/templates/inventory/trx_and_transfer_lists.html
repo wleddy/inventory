@@ -3,8 +3,9 @@
         <div id="qoh_list" class="w3-card-4">
             <h3>Quantity on Hand: {{ on_hand | default(0) }}</h3>
             {% if qoh_list %}
+            <p><strong>By Warehouse...</strong></p>
             {% for rec in qoh_list %}
-            <p>{{ rec.name }}: {{ rec.qty }}</p>
+            <p>&nbsp;&nbsp;{{ rec.name }}: {{ rec.qty }}</p>
             {% endfor %}
             {% else %}
             <p>No product on hand</p>
