@@ -90,8 +90,6 @@ def edit(id=None):
             flash('Record not Found')
             return redirect(g.listURL)
             
-    # from inventory.views.transaction import get_list_for_item
-#     from inventory.views.transfer import get_list_for_item as get_transfers_for_item
     transactionList = get_list_for_item(rec.id)
     transferList = get_transfers_for_item(rec.id)
     qoh_list = get_qoh_by_warehouse(rec.id)
