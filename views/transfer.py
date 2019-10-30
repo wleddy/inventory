@@ -68,7 +68,9 @@ def edit_from_list(id=None,item_id=None):
     else:
         rec = transfer.new()
         rec.transfer_date = local_datetime_now()
-    
+        if 'last_transfer' in session:
+            transfer.update(rec,session['last_transfer'])
+        
     # Handle Response?
     if request.form:
         #import pdb;pdb.set_trace()
@@ -261,6 +263,8 @@ def save_record(rec):
         rec.out_trx_id = trx_rec2.id
         
         Transfer(g.db).save(rec)
+        #Save some data to session
+        session['last_transfer'] = {"transfer_date":rec.transfer_date,}
         
         try:
             g.db.commit()
