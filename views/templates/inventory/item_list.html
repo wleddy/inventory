@@ -1,19 +1,13 @@
 {% extends "layout.html" %}
+{% from "_layout_helpers.html" import list_search_widget %}
 {% block title %}{{ g.title }}{% endblock %}
 {% block body %}
-  	<p id="addRecord"><a href="{{ g.editURL }}0/">Add a new record</a>
-    &nbsp;&nbsp;Find in:
-    <select id="col_select">
-        <option value="0">Id</option>
-        <option value="1" selected >Name</option>
-        <option value="2" >Category</option>
-    </select>
-        &nbsp;&nbsp;<input id="search_input" type="text" name="user_name" value="" class="w3-border" placeholder="Type anything" autofocus
-        onkeyup="if (this.value.length > 0){ table_search('search_input','table_list',$('#col_select').val());}else{reset_table_search('table_list')}"
-        />
-        <!-- &nbsp;<input type="checkbox" name="save_list_search" id="save_list_search"
-        onclick=""
-        />&nbsp;<label for="save_list_search">Keep Search Term</label> -->
+  	<p id="addRecord">
+        <a href="{{ g.editURL }}0/">Add a new record</a>
+        &nbsp;&nbsp;{{ list_search_widget('item',{'Id':0,'Name':1,'Category':2,},1) }}
+        
+        
+        
     </p>
 	{%if recs %}
 		<table id="table_list" class="datatable w3-table w3-striped w3-hoverable">
