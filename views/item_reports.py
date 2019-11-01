@@ -26,8 +26,8 @@ def stock_on_hand_report(start_date=None,end_date=None,warehouse=-1):
         
         sql = """SELECT 
                 item.*, 
-                wares.name as warehouse,
-                cats.name as category
+                cats.name as category,
+                wares.name as warehouse
             
                 from item
                 left join trx on trx.item_id = item.id
@@ -45,8 +45,8 @@ def stock_on_hand_report(start_date=None,end_date=None,warehouse=-1):
         
         sql = """SELECT 
                 item.*, 
-                "{warehouse_name}" as warehouse,
-                cats.name as category
+                cats.name as category,
+                "{warehouse_name}" as warehouse
                 from item
                 join category as cats on cats.id = item.cat_id
             
