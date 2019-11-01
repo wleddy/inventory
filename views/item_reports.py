@@ -76,7 +76,7 @@ def stock_on_hand_report(start_date=None,end_date=None,warehouse=-1):
         with output as csvfile:
             writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
             app_config = get_app_config()
-            row = {fieldnames[0]: "{} Stock Report from {} thru {}".format(app_config["SITE_NAME"],iso_date_string(start_date),iso_date_string(end_date)) }
+            row = {fieldnames[0]: "{} Stock Report from {} thru {}, Warehouse: {}".format(app_config["SITE_NAME"],iso_date_string(start_date),iso_date_string(end_date),warehouse_name) }
             writer.writerow(row)
             writer.writeheader()
             
@@ -103,7 +103,7 @@ def stock_on_hand_report(start_date=None,end_date=None,warehouse=-1):
             out = output.getvalue()
 
             
-    name = 'stock_report_{}'.format(local_datetime_now().strftime('%Y%m%d_%H%M'))
+    name = 'stock_report__for_{}_{}'.format(warehouse_name,local_datetime_now().strftime('%Y%m%d_%H%M'))
     return send_as_file(out,name=name,ext='csv')
     
 def send_as_file(out,name='report',ext='csv'):
