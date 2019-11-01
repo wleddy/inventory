@@ -207,6 +207,7 @@ def stock_report():
     
 def validate_form():
     valid_form = True
+    #import pdb;pdb.set_trace()
     if request.form['name'].strip() == '':
         valid_form = False
         flash('The name may not be empty')
@@ -214,6 +215,17 @@ def validate_form():
     if request.form['cat_id'] == None or request.form['cat_id'] == "0":
         valid_form = False
         flash('You must select a category for this item')
+        
+    # min stock must be a number >= 0
+    try:
+        x = float(request.form.get('min_stock'))
+    except:
+        x = -1
+        
+    if x < 0:
+        flash("Minimum Stock must be a number equal or greater than 0")
+        valid_form = False
+            
         
     return valid_form
     

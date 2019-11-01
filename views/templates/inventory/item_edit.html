@@ -12,7 +12,7 @@
         <p>{{ select_field("cat_id","Category", req=True) }}
                 <option value="0" ><em>Select One...</em></option>
                 {% for category in categories %}
-                <option value="{{ category.id }}" {% if rec.cat_id == category.id %}selected{% endif %} >{{ category.name}}</option>
+                <option value="{{ category.id }}" {% if rec.cat_id | int == category.id %}selected{% endif %} >{{ category.name}}</option>
                 {% endfor %}
             </select>
         </p>
