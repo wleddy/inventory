@@ -21,7 +21,7 @@ def stock_on_hand(id=None):
     if rec:
         soh = Item(g.db).stock_on_hand(cleanRecordID(id))
         if soh > 0:
-            if soh >= rec.min_stock:
+            if soh >= cleanRecordID(rec.min_stock):
                 return soh
             else:
                 return "{} Min ({})".format(soh,rec.min_stock)
