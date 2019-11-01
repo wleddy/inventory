@@ -36,7 +36,7 @@ def stock_on_hand_report(start_date=None,end_date=None,warehouse=-1):
             
                 Where {where}
                 group by item.id
-                order by lower(category), item.name
+                order by lower(category), lower(item.name)
         """.format(where=where)
         
         
@@ -50,7 +50,7 @@ def stock_on_hand_report(start_date=None,end_date=None,warehouse=-1):
                 from item
                 join category as cats on cats.id = item.cat_id
             
-                order by lower(category), item.name
+                order by lower(category), lower(item.name)
         """.format(warehouse_name=warehouse_name)
     recs = items.query(sql)
     
