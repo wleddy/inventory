@@ -65,10 +65,10 @@ def stock_on_hand_report(start_date=None,end_date=None,warehouse=-1):
         fields = recs[0]._fields # a tuple
         fieldnames = [s for s in fields if s not in fields_to_ignore ]
         extras = []
+        extras.append('lifo cost')
         extras.append('prev soh')
         extras.append('added')
         extras.append('used')
-        extras.append('lifo cost')
         extras.append('on hand')
         fieldnames.extend(extras)
     
@@ -82,10 +82,10 @@ def stock_on_hand_report(start_date=None,end_date=None,warehouse=-1):
             
             #import pdb;pdb.set_trace()
             for rec in recs:
-                extras_value_list = [items.stock_on_hand(rec.id,start_date - timedelta(days=1),warehouse_id=warehouse_id),
+                extras_value_list = [items.lifo_cost(rec.id,warehouse_id=warehouse_id),
+                    items.stock_on_hand(rec.id,start_date - timedelta(days=1),warehouse_id=warehouse_id),
                     items.additions(rec.id,start_date,end_date,warehouse_id=warehouse_id),
                     items.subtractions(rec.id,start_date,end_date,warehouse_id=warehouse_id),
-                    items.lifo_cost(rec.id,warehouse_id=warehouse_id),
                     items.stock_on_hand(rec.id,end_date,warehouse_id=warehouse_id),]
 
                 temp_row = rec._asdict()
