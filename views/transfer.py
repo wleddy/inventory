@@ -43,18 +43,18 @@ def display():
 @mod.route('/edit_from_list/<int:id>/<int:item_id>/',methods=["GET", "POST",])
 @table_access_required(Transfer)
 def edit_from_list(id=None,item_id=None):
-    """Handle creation of transfer from the Item record form"""
+    """Handle creation of transfer from the Item record form
+       It's not practical to edit existing transfers, so delete the offending
+       transfer record then recreate it instead.
+    """
     setExits()
     #import pdb;pdb.set_trace()
     
-    item_id=cleanRecordID(item_id)
-    item_rec = None
     rec = None
-    warehouses = get_warehouse_dropdown(item_id)
-    warehouse_in_id = cleanRecordID(request.form.get('warehouse_in_id',0))
-    warehouse_out_id = cleanRecordID(request.form.get('warehouse_out_id',0))
-    transfer = Transfer(g.db)
+    item_rec = None
     tran_id = cleanRecordID(id)
+    item_id=cleanRecordID(item_id)
+    transfer = Transfer(g.db)
     if tran_id > 0:
         sql = get_transfer_select(where="transfer.id = {}".format(tran_id))
         rec = transfer.query(sql)
@@ -62,35 +62,36 @@ def edit_from_list(id=None,item_id=None):
     if rec:
         rec = rec[0]
         item_id = rec.item_id
-        warehouse_in_id = rec.warehouse_in_id
-        warehouse_out_id = rec.warehouse_out_id
+        # warehouse_in_id = rec.warehouse_in_id
+        # warehouse_out_id = rec.warehouse_out_id
         
     else:
         rec = transfer.new()
         rec.transfer_date = local_datetime_now()
         if 'last_transfer' in session:
             transfer.update(rec,session['last_transfer'])
+    
+    if item_id > 0:
+        item_rec = Item(g.db).get(item_id)
+
+    if item_rec:
+        rec.item_id=item_id
+    else:
+        flash("This is not a valid item id")
+        return "failure: This is not a valid item id."
+        
+    warehouses = get_warehouse_dropdown(item_id)
+    warehouse_in_id = cleanRecordID(request.form.get('warehouse_in_id',rec._asdict().get('warehouse_in_id',0)))
+    warehouse_out_id = cleanRecordID(request.form.get('warehouse_out_id',rec._asdict().get('warehouse_out_id',0)))
         
     # Handle Response?
     if request.form:
         #import pdb;pdb.set_trace()
         
-        transfer.update(rec,request.form)
         if save_record(rec):
             return "success" # the success function looks for this...
         else:
             pass
-            
-    
-    if item_id > 0:
-        item_rec = Item(g.db).get(item_id)
-    
-    if not item_rec:
-        flash("This is not a valid item id")
-        return "failure: This is not a valid item id."
-    else:
-        rec.item_id=item_id
-        
             
     return render_template('transfer_edit_from_list.html',
             rec=rec,
@@ -228,41 +229,50 @@ def handle_delete(id=None):
     
 def save_record(rec):
     """Attempt to validate and save a record"""
-    if validate_form(rec):
+    
+    #import pdb;pdb.set_trace()
+    
+    transfer = Transfer(g.db)
+    trx_table = Transaction(g.db)
+    
         
-        Transfer(g.db).save(rec)
+    transfer.update(rec,request.form)
+    if validate_form(rec):
+        if rec.id:
+            ## delete the current transfer record.
+            trx_table.delete(cleanRecordID(rec.out_trx_id))
+            trx_table.delete(cleanRecordID(rec.in_trx_id))
+            ## related transfer record is deleted by cascade
+            transfer.delete(cleanRecordID(rec.id))
+            g.db.commit() # trigger the casscade delete of transactions
+            rec = transfer.new()
+            transfer.update(rec,request.form)
+        
+        transfer.save(rec)
         #Create trx recods for this transfer...
-        #create the Outgoing trx record if needed
-        trx_table = Transaction(g.db)
-        if rec.in_trx_id:
-            trx_rec = trx_table.get(in_trx_id)
-        else:
-            trx_rec = trx_table.new()
+        #create the Outgoing trx record
+        trx_rec = trx_table.new()
             
         trx_rec.item_id = rec.item_id
-        trx_rec.qty = rec.qty * -1
+        trx_rec.qty = abs(rec.qty) * -1
         trx_rec.created = rec.transfer_date
         trx_rec.warehouse_id = request.form["warehouse_out_id"]
         trx_rec.value = 0
         trx_rec.trx_type = "Transfer Out"
         trx_table.save(trx_rec)
-        rec.in_trx_id = trx_rec.id
+        rec.out_trx_id = trx_rec.id
         
-        #Create the incomming transaction
-        if rec.out_trx_id:
-            trx_rec2 = trx_table.get(out_trx_id)
-        else:
-            trx_rec2 = trx_table.new()
+        trx_rec2 = trx_table.new()
             
         trx_table.update(trx_rec2,trx_rec._asdict())
-        trx_rec2.qty = rec.qty
+        trx_rec2.qty = abs(rec.qty)
         trx_rec2.value = Item(g.db).lifo_cost(trx_rec.item_id,end_date=rec.transfer_date)
         trx_rec2.warehouse_id = request.form["warehouse_in_id"]
         trx_rec2.trx_type = "Transfer In"
         trx_table.save(trx_rec2)
-        rec.out_trx_id = trx_rec2.id
+        rec.in_trx_id = trx_rec2.id
         
-        Transfer(g.db).save(rec)
+        transfer.save(rec)
         #Save some data to session
         session['last_transfer'] = {"transfer_date":rec.transfer_date,}
         
@@ -282,7 +292,7 @@ def validate_form(rec):
     valid_form = True
         
     #Try to coerse qty to a number
-    if rec.qty.strip() =='':
+    if request.form['qty'].strip() =='':
         flash('Quantity is required')
         valid_form = False
     else:

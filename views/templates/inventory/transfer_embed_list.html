@@ -6,7 +6,7 @@
         <th>Qty</th>
         <th>From</th>
         <th>To</th>
-        <th>Actions</th>
+        <th>&nbsp;</th>
     </tr>
     {% for rec in recs %}
         <tr id="trans-{{rec.id}}" style="vertical-align:middle;" >
@@ -14,7 +14,7 @@
             <td style="text-align:right;">{{rec.qty | money() }}</td>
             <td>{{ rec.warehouse_out_name }}</td>
             <td>{{ rec.warehouse_in_name }}</td>
-            <td><span class="w3-btn w3-ripple w3-primary-color w3-mobile w3-round-large" onclick="editFromList('{{ url_for('transfer.edit_from_list')}}{{ rec.id }}/','transfer_list')">Edit</span></td>
+            <td><span class="w3-btn w3-ripple w3-primary-color w3-mobile w3-round-large" onclick="deleteTransfer({{ rec.id }})" >Delete</span></td>
         </tr>
     {% endfor%}
     </table>
@@ -22,3 +22,10 @@
     <p>No Transfers to list...</p>
 {% endif %}
 
+<script>
+    function deleteTransfer(trans_id) {
+        if(confirm("Delete this transfer?")){
+            $('#transactions_and_transfers').load('{{ url_for("transfer.delete_from_list") }}'+trans_id);
+        }
+    }
+</script>
