@@ -111,7 +111,7 @@ def refresh_trx_lists(item_id=0):
     #import pdb;pdb.set_trace()
     item_id = cleanRecordID(item_id)
     transactionList = get_trx_list_for_item(item_id)
-    transferList = get_transfer_for_item(item_id)
+    transferList = get_transfer_list_for_item(item_id)
     qoh_list = get_qoh_by_warehouse(item_id)
     on_hand = get_stock_on_hand(item_id)
     
