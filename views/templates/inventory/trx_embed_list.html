@@ -23,7 +23,7 @@
         {% set temprow = row_count.pop()%}
         {% set temprow = temprow + 1 %}
         {% set row_count = row_count.append(temprow) %}
-        {% if temprow == 6 and trx | length > 6 %}
+        {% if temprow == 6 and trxs | length > 6 %}
         <tr><td colspan=6 class="scriptlink" onclick="showExtraTrx()" id="showMore">Show More...</td></tr>
         {% set row_class = row_class.append('extraTrx')%}
         {% endif %}
