@@ -5,8 +5,8 @@ from shotglass2.takeabeltof.utils import printException, cleanRecordID
 from shotglass2.takeabeltof.date_utils import local_datetime_now, getDatetimeFromString
 from inventory.models import Item, Category, Uom, Transaction, Warehouse
 from .item_reports import stock_on_hand_report
-from inventory.views.transaction import get_list_for_item
-from inventory.views.transfer import get_list_for_item as get_transfers_for_item 
+from inventory.views.transaction import get_trx_list_for_item
+from inventory.views.transfer import get_transfer_list_for_item 
 
 mod = Blueprint('item',__name__, template_folder='templates/inventory', static_folder='static/inventory', url_prefix='/items')
 
@@ -17,7 +17,7 @@ def setExits():
     g.deleteURL = url_for('item.delete')
     g.title = 'Inventory Item'
     g.stock_reportURL = url_for('item.stock_report')
-    g.trxListFromItemURL = url_for('item.transaction_list_for_item')
+    #g.trxListFromItemURL = url_for('item.transaction_list_for_item')
 
 @mod.route('/',methods=["GET",])
 @table_access_required(Item)
@@ -90,8 +90,8 @@ def edit(id=None):
             flash('Record not Found')
             return redirect(g.listURL)
             
-    transactionList = get_list_for_item(rec.id)
-    transferList = get_transfers_for_item(rec.id)
+    transactionList = get_trx_list_for_item(rec.id)
+    transferList = get_transfer_list_for_item(rec.id)
     qoh_list = get_qoh_by_warehouse(rec.id)
     on_hand = item.stock_on_hand(id)
     
@@ -110,8 +110,8 @@ def edit(id=None):
 def refresh_trx_lists(item_id=0):
     #import pdb;pdb.set_trace()
     item_id = cleanRecordID(item_id)
-    transactionList = get_list_for_item(item_id)
-    transferList = get_transfers_for_item(item_id)
+    transactionList = get_trx_list_for_item(item_id)
+    transferList = get_transfer_for_item(item_id)
     qoh_list = get_qoh_by_warehouse(item_id)
     on_hand = get_stock_on_hand(item_id)
     
@@ -143,14 +143,6 @@ def cancel(id=None):
 @mod.route('/get_stock_on_hand/<int:item_id>/',methods=["GET",])
 def get_stock_on_hand(item_id=0):  
     return str(Item(g.db).stock_on_hand(cleanRecordID(item_id)))
-    
-    
-@mod.route('/transaction_list_for_item',methods=["GET",])
-@mod.route('/transaction_list_for_item/<int:item_id>',methods=["GET",])
-@table_access_required(Item)
-def transaction_list_for_item(item_id=None):
-    setExits()
-    return get_list_for_item(item_id)
     
     
 @mod.route('/delete',methods=["GET", "POST",])
@@ -250,3 +242,10 @@ def get_qoh_by_warehouse(id):
         flash("Invalid item ID")
         
     return recs
+    
+def transaction_list_for_item(item_id=None):
+    setExits()
+    return get_trx_list_for_item(item_id)
+    
+    
+    

@@ -174,26 +174,6 @@ def edit(id=None):
     return render_template('transfer_edit.html',rec=rec,current_item=current_item,items=items)
 
 
-@mod.route('/get_transfer_list/',methods=["GET", ])
-@mod.route('/get_transfer_list/<int:item_id>/',methods=["GET", ])
-def get_list_for_item(item_id=None):
-    """Render an html snippet of the transaciton list for the item"""
-    
-    
-    item_id = cleanRecordID(item_id)
-    recs = None
-    where = "1"
-    if item_id and item_id > 0:
-        where = 'transfer.item_id = {}'.format(item_id)
-
-        sql = get_transfer_select(where)
-            
-        #print(sql)
-        recs = Transfer(g.db).query(sql)
-                
-    return render_template('transfer_embed_list.html',recs=recs,item_id=item_id)
-    
-    
 @mod.route('/delete',methods=["GET", "POST",])
 @mod.route('/delete/',methods=["GET", "POST",])
 @mod.route('/delete/<int:id>/',methods=["GET", "POST",])
@@ -385,4 +365,23 @@ def get_warehouse_dropdown(item_id=0):
             out[len(out)-1].update({'qoh':qoh})
             
     return out
+        
+        
+def get_transfer_list_for_item(item_id=None):
+    """Render an html snippet of the transaciton list for the item"""
+
+    item_id = cleanRecordID(item_id)
+    recs = None
+    where = "1"
+    if item_id and item_id > 0:
+        where = 'transfer.item_id = {}'.format(item_id)
+
+        sql = get_transfer_select(where)
+        
+        #print(sql)
+        recs = Transfer(g.db).query(sql)
+            
+    return render_template('transfer_embed_list.html',recs=recs,item_id=item_id)
+
+    
         
