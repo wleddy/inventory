@@ -11,7 +11,7 @@ mod = Blueprint('transfer',__name__, template_folder='templates/inventory', stat
 
 def setExits():
     g.listURL = url_for('.display')
-    g.editURL = url_for('.edit')
+    #g.editURL = url_for('.edit')
     g.deleteURL = url_for('.delete')
     g.title = 'Inventory Transfer'
 
@@ -37,6 +37,9 @@ def display():
     return render_template('transfer_list.html',recs=recs,item=item)
     
     
+### In reality this is only used to add new transfers since editing opens a whole can of worms.
+### Just delete bad transfer records and recreate them
+
 @mod.route('/edit_from_list',methods=["GET", "POST",])
 @mod.route('/edit_from_list/',methods=["GET", "POST",])
 @mod.route('/edit_from_list/<int:id>/',methods=["GET", "POST",])
@@ -49,7 +52,7 @@ def edit_from_list(id=None,item_id=None):
     """
     setExits()
     #import pdb;pdb.set_trace()
-    
+
     rec = None
     item_rec = None
     tran_id = cleanRecordID(id)
@@ -58,19 +61,19 @@ def edit_from_list(id=None,item_id=None):
     if tran_id > 0:
         sql = get_transfer_select(where="transfer.id = {}".format(tran_id))
         rec = transfer.query(sql)
-        
+
     if rec:
         rec = rec[0]
         item_id = rec.item_id
         # warehouse_in_id = rec.warehouse_in_id
         # warehouse_out_id = rec.warehouse_out_id
-        
+
     else:
         rec = transfer.new()
         rec.transfer_date = local_datetime_now()
         if 'last_transfer' in session:
             transfer.update(rec,session['last_transfer'])
-    
+
     if item_id > 0:
         item_rec = Item(g.db).get(item_id)
 
@@ -79,20 +82,20 @@ def edit_from_list(id=None,item_id=None):
     else:
         flash("This is not a valid item id")
         return "failure: This is not a valid item id."
-        
+
     warehouses = get_warehouse_dropdown(item_id)
     warehouse_in_id = cleanRecordID(request.form.get('warehouse_in_id',rec._asdict().get('warehouse_in_id',0)))
     warehouse_out_id = cleanRecordID(request.form.get('warehouse_out_id',rec._asdict().get('warehouse_out_id',0)))
-        
+
     # Handle Response?
     if request.form:
         #import pdb;pdb.set_trace()
-        
+
         if save_record(rec):
             return "success" # the success function looks for this...
         else:
             pass
-            
+
     return render_template('transfer_edit_from_list.html',
             rec=rec,
             warehouses=warehouses,
@@ -116,62 +119,67 @@ def delete_from_list(id=None):
 
     return 'failure: Could not delete that {}'.format(g.title)
     
-@mod.route('/edit',methods=["GET", "POST",])
-@mod.route('/edit/',methods=["GET", "POST",])
-@mod.route('/edit/<int:id>/',methods=["GET", "POST",])
-@table_access_required(Transfer)
-def edit(id=None):
-    setExits()
-    #import pdb;pdb.set_trace()
     
-    transfer = Transfer(g.db)
-    
-    if request.form:
-        id = request.form.get('id',None)
-    id = cleanRecordID(id)
-    items = Item(g.db).select()
-    current_item = None
-    
-    if id < 0:
-        flash("Invalid Record ID")
-        return redirect(g.listURL)
-    
-    if id >= 0 and not request.form:
-        if id == 0:
-            rec = transfer.new()
-            rec.transfer_date = local_datetime_now()
-            
-        else:
-            rec = transfer.get(id)
-            
-        if not rec:
-            flash('Record not Found')
-            return redirect(g.listURL)
-        else:
-            #Get the item if there is one
-            if rec.item_id != 0:
-                current_item = Item(g.db).get(rec.item_id)
-                
-            
-    elif request.form:
-        if id == 0:
-            rec = transfer.new()
-            #rec.transfer_date = local_datetime_now()
-        else:
-            rec = transfer.get(id)
-            if not rec:
-                flash('Record not found when trying to save')
-                return redirect(g.listURL)
-                
-        transfer.update(rec,request.form)
-        if save_record(rec):
-            return redirect(g.listURL)
-        else:
-            for err in error_list:
-                flash(err)
-        return redirect(g.listURL)
-                    
-    return render_template('transfer_edit.html',rec=rec,current_item=current_item,items=items)
+###
+# On further review, it is too problematic to actually edit existing transfers. Just
+# delete them and recreate as needed.
+###
+# @mod.route('/edit',methods=["GET", "POST",])
+# @mod.route('/edit/',methods=["GET", "POST",])
+# @mod.route('/edit/<int:id>/',methods=["GET", "POST",])
+# @table_access_required(Transfer)
+# def edit(id=None):
+#     setExits()
+#     #import pdb;pdb.set_trace()
+#
+#     transfer = Transfer(g.db)
+#
+#     if request.form:
+#         id = request.form.get('id',None)
+#     id = cleanRecordID(id)
+#     items = Item(g.db).select()
+#     current_item = None
+#
+#     if id < 0:
+#         flash("Invalid Record ID")
+#         return redirect(g.listURL)
+#
+#     if id >= 0 and not request.form:
+#         if id == 0:
+#             rec = transfer.new()
+#             rec.transfer_date = local_datetime_now()
+#
+#         else:
+#             rec = transfer.get(id)
+#
+#         if not rec:
+#             flash('Record not Found')
+#             return redirect(g.listURL)
+#         else:
+#             #Get the item if there is one
+#             if rec.item_id != 0:
+#                 current_item = Item(g.db).get(rec.item_id)
+#
+#
+#     elif request.form:
+#         if id == 0:
+#             rec = transfer.new()
+#             #rec.transfer_date = local_datetime_now()
+#         else:
+#             rec = transfer.get(id)
+#             if not rec:
+#                 flash('Record not found when trying to save')
+#                 return redirect(g.listURL)
+#
+#         transfer.update(rec,request.form)
+#         if save_record(rec):
+#             return redirect(g.listURL)
+#         else:
+#             for err in error_list:
+#                 flash(err)
+#         return redirect(g.listURL)
+#
+#     return render_template('transfer_edit.html',rec=rec,current_item=current_item,items=items)
 
 
 @mod.route('/delete',methods=["GET", "POST",])
