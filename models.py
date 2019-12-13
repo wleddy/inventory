@@ -90,6 +90,7 @@ class Item(SqliteTable):
         if "warehouse_id" is in kwargs, limit search to that warehouse
         
         """
+        # 12/13/19 - exclude Transfer transactions
         
         warehouse_where = self._get_warehouse_where(**kwargs)
         
@@ -97,7 +98,9 @@ class Item(SqliteTable):
         #import pdb;pdb.set_trace()
         start_date,end_date = self.set_dates(start_date,end_date)
         sql = """select COALESCE(sum(qty), 0) as qty from trx where item_id = {} and qty > 0 
-        and date(created) >= date("{}") and date(created) <= date("{}") {}
+        and date(created) >= date("{}") and date(created) <= date("{}") 
+        and trx_type not like 'Transfer%'
+        {}
         """.format(id,start_date,end_date,warehouse_where)
         
         rec = self.db.execute(sql).fetchone()
@@ -110,14 +113,17 @@ class Item(SqliteTable):
         if "warehouse_id" is in kwargs, limit search to that warehouse
         
         """
-            
+        # 12/13/19 - exclude Transfer transactions
+        
         warehouse_where = self._get_warehouse_where(**kwargs)
             
         id = cleanRecordID(id)
         start_date,end_date = self.set_dates(start_date,end_date)
         sql = """
             select COALESCE(sum(qty), 0) as qty from trx where item_id = {} and qty < 0
-            and date(created) >= date("{}") and date(created) <= date("{}") {}
+            and date(created) >= date("{}") and date(created) <= date("{}") 
+            and trx_type not like 'Transfer%'
+            {}
         """.format(id,start_date,end_date,warehouse_where)
         rec = self.db.execute(sql).fetchone()
         return self.handle_rec_value(rec,'qty')
