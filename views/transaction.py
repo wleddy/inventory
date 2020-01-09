@@ -194,6 +194,15 @@ def handle_delete(id=None):
 def save_record(rec,err_list=[]):
     """Attempt to validate and save a record"""
     if validate_form(rec):
+        # Set the sign of qty based on transaction type
+        if not rec.qty:
+            rec.qty = 0
+        else:
+            rec.qty = abs(rec.qty)
+            
+        if rec.trx_type.lower() == "remove" and rec.qty != 0:
+            rec.qty = rec.qty * -1
+            
         Transaction(g.db).save(rec)
         try:
             g.db.commit()
