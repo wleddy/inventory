@@ -25,29 +25,63 @@ class Item(SqliteTable):
             cat_id INT
             """
         super().create_table(sql)
-
-    def _select_sql(self,**kwargs):
-        """Return the sql text that will be used by select or select_one
-        optional kwargs are:
-            where: text to use in the where clause
-            order_by: text to include in the order by clause
         
-            This version deals with the category.name, item.name sorting that I 
-            want to do most of the time
+        
+    def select(self,where=None,order_by=None):
+        where = where if where else '1'
+        order_by = order_by if order_by else self.order_by_col
+        sql = """SELECT 
+                    item.*, 
+                    cats.name as category,
+                    COALESCE (
+                        (select trx.value from trx 
+                            where trx.item_id = item.id  
+                            and trx.value > 0 and {where} order by trx.created desc limit 1
+                        )
+                    ,0) as lifo_cost,
+                    COALESCE (
+                        (select sum(trx.qty) from trx 
+                            where trx.item_id = item.id  
+                            and {where}
+                        )
+                    ,0) as soh
             
-            provide a where or order_by kwarg to use standard method instead
+                    from item
+                    left join trx on trx.item_id = item.id
+                    left join warehouse as wares on wares.id = trx.warehouse_id
+                    join category as cats on cats.id = item.cat_id
             
-        """
-        where = kwargs.get('where',None)
-        order_by = kwargs.get('order_by',None)
-        if order_by == None and where == None:
-            # do the related order by
-            sql = 'SELECT item.* FROM {} '.format(self.table_name)
-            sql += 'JOIN category on item.cat_id = category.id '
-            sql += 'ORDER BY category.name, item.name'
-            return sql
-        # else do a normal select
-        return super()._select_sql(**kwargs)
+                    where {where} 
+                    group by item.id
+                    order by lower(category), lower(item.name)
+            """.format(
+                where=where,
+                )
+        
+        return self.query(sql)
+
+    # def _select_sql(self,**kwargs):
+    #     """Return the sql text that will be used by select or select_one
+    #     optional kwargs are:
+    #         where: text to use in the where clause
+    #         order_by: text to include in the order by clause
+    #
+    #         This version deals with the category.name, item.name sorting that I
+    #         want to do most of the time
+    #
+    #         provide a where or order_by kwarg to use standard method instead
+    #
+    #     """
+    #     where = kwargs.get('where',None)
+    #     order_by = kwargs.get('order_by',None)
+    #     if order_by == None and where == None:
+    #         # do the related order by
+    #         sql = 'SELECT item.* FROM {} '.format(self.table_name)
+    #         sql += 'JOIN category on item.cat_id = category.id '
+    #         sql += 'ORDER BY category.name, item.name'
+    #         return sql
+    #     # else do a normal select
+    #     return super()._select_sql(**kwargs)
 
 
     def _get_warehouse_where(self,**kwargs):
@@ -91,6 +125,7 @@ class Item(SqliteTable):
         
         """
         # 12/13/19 - exclude Transfer transactions
+        # 11/13/20 - don't worry about transfers, include all trx.qty > 0
         
         warehouse_where = self._get_warehouse_where(**kwargs)
         
@@ -99,7 +134,7 @@ class Item(SqliteTable):
         start_date,end_date = self.set_dates(start_date,end_date)
         sql = """select COALESCE(sum(qty), 0) as qty from trx where item_id = {} and qty > 0 
         and date(created) >= date("{}") and date(created) <= date("{}") 
-        and trx_type not like 'Transfer%'
+        and trx.qty > 0
         {}
         """.format(id,start_date,end_date,warehouse_where)
         

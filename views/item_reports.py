@@ -7,104 +7,102 @@ from shotglass2.takeabeltof.date_utils import local_datetime_now
 from shotglass2.takeabeltof.jinja_filters import iso_date_string
 from shotglass2.takeabeltof.utils import cleanRecordID
 from datetime import timedelta
-import csv
-from io import StringIO
-from collections import OrderedDict
+
+from shotglass2.takeabeltof.views import TableView
+    
 
 def stock_on_hand_report(start_date=None,end_date=None,warehouse=-1):
-    """Create a CSV report of the current state of Item"""
-    out = ''
+    view = TableView(Item,g.db)
+
+    view.export_fields = [
+            {'name':'name',},
+            {'name':'uom',},
+            {'name':'category',},
+            {'name':'warehouse',},
+            {'name':'lifo_cost',},
+            {'name':'prev_soh',},
+            {'name':'added',},
+            {'name':'used',},
+            {'name':'soh','label':'On Hand'},
+        ]
     
-    #import pdb;pdb.set_trace()
-    items = Item(g.db)
-    warehouse_id = cleanRecordID(warehouse)
+    # import pdb;pdb.set_trace()
+    view.path = ['export',]
+    
+    wares_source = "'All'"
     where = '1'
-    warehouse_name = "All"
+    warehouse_id = cleanRecordID(warehouse)
     if warehouse_id > 0:
         where = " trx.warehouse_id = {}".format(warehouse_id)
-        warehouse_name = Warehouse(g.db).get(warehouse).name
-        
-        sql = """SELECT 
-                item.*, 
-                cats.name as category,
-                wares.name as warehouse
-            
-                from item
-                left join trx on trx.item_id = item.id
-                left join warehouse as wares on wares.id = trx.warehouse_id
-                join category as cats on cats.id = item.cat_id
-            
-                Where {where}
-                group by item.id
-                order by lower(category), lower(item.name)
-        """.format(where=where)
-        
-        
-    else:
-        warehouse_id = None
-        
-        sql = """SELECT 
-                item.*, 
-                cats.name as category,
-                "{warehouse_name}" as warehouse
-                from item
-                join category as cats on cats.id = item.cat_id
-            
-                order by lower(category), lower(item.name)
-        """.format(warehouse_name=warehouse_name)
-    recs = items.query(sql)
-    
+        wares_source = 'wares.name'
     # Default to reporting only for this year
     if start_date is None:
         start_date = local_datetime_now().replace(month=1,day=1)
     if end_date is None:
         end_date = local_datetime_now().replace(year=local_datetime_now().year,month=12,day=31)
         
-    if recs:
-        fields_to_ignore = ['id','cat_id','description',]
-        fields = recs[0]._fields # a tuple
-        fieldnames = [s for s in fields if s not in fields_to_ignore ]
-        extras = []
-        extras.append('lifo cost')
-        extras.append('prev soh')
-        extras.append('added')
-        extras.append('used')
-        extras.append('on hand')
-        fieldnames.extend(extras)
+                
+    view.sql = """SELECT 
+                item.*, 
+                cats.name as category,
+                {wares_source} as warehouse,
+                COALESCE (
+                    (select trx.value from trx 
+                        where trx.item_id = item.id  
+                        and date(trx.created, 'localtime') <= date('{end_date}','localtime') 
+                        and trx.value > 0 and {where} order by trx.created desc limit 1
+                    )
+                ,0) as lifo_cost,
+                COALESCE (
+                    (select sum(trx.qty) from trx 
+                        where trx.item_id = item.id  
+                        and date(trx.created, 'localtime') < date('{start_date}','localtime') 
+                        and {where}
+                    )
+                ,0) as prev_soh,
+                COALESCE (
+                    (select sum(trx.qty) from trx 
+                        where trx.item_id = item.id  
+                        and date(trx.created, 'localtime') >= date('{start_date}','localtime') 
+                        and date(trx.created, 'localtime') <= date('{end_date}','localtime') 
+                        and {where} and trx.qty > 0
+                    )
+                ,0) as added,
+                COALESCE (
+                    (select sum(trx.qty) from trx 
+                        where trx.item_id = item.id  
+                        and date(trx.created, 'localtime') >= date('{start_date}','localtime') 
+                        and date(trx.created, 'localtime') <= date('{end_date}','localtime') 
+                        and {where} and lower(trx.trx_type) = 'remove'
+                    )
+                ,0) as used,
+                COALESCE (
+                    (select sum(trx.qty) from trx 
+                        where trx.item_id = item.id  
+                        and date(trx.created, 'localtime') <= date('{end_date}','localtime') 
+                        and {where}
+                    )
+                ,0) as soh
+            
+                from item
+                left join trx on trx.item_id = item.id
+                left join warehouse as wares on wares.id = trx.warehouse_id
+                join category as cats on cats.id = item.cat_id
+            
+                Where {where} 
+                    and date(trx.created,'localtime') >= date('{start_date}','localtime') 
+                    and date(trx.created,'localtime') <= date('{end_date}','localtime')
+                group by item.id
+                order by lower(category), lower(item.name)
+        """.format(
+            where=where,
+            start_date=iso_date_string(start_date),
+            end_date=iso_date_string(end_date),
+            wares_source=wares_source,
+            )
+
+    return view.dispatch_request()
     
-        output = StringIO()
-        with output as csvfile:
-            writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-            app_config = get_app_config()
-            row = {fieldnames[0]: "{} Stock Report from {} thru {}, Warehouse: {}".format(app_config["SITE_NAME"],iso_date_string(start_date),iso_date_string(end_date),warehouse_name) }
-            writer.writerow(row)
-            writer.writeheader()
-            
-            #import pdb;pdb.set_trace()
-            for rec in recs:
-                extras_value_list = [items.lifo_cost(rec.id,warehouse_id=warehouse_id),
-                    items.stock_on_hand(rec.id,start_date - timedelta(days=1),warehouse_id=warehouse_id),
-                    items.additions(rec.id,start_date,end_date,warehouse_id=warehouse_id),
-                    items.subtractions(rec.id,start_date,end_date,warehouse_id=warehouse_id),
-                    items.stock_on_hand(rec.id,end_date,warehouse_id=warehouse_id),]
-
-                temp_row = rec._asdict()
-                # temp_row is an orderedDict and elements can't be removed
-                row = OrderedDict()
-                for key, value in temp_row.items():
-                    if key not in fields_to_ignore:
-                        row[key] = value
-                    
-                for x in range(len(extras_value_list)):
-                    row[extras[x]] = extras_value_list[x]
-                        
-                writer.writerow(row)
-                    
-            out = output.getvalue()
-
-            
-    name = 'stock_report__for_{}_{}'.format(warehouse_name,local_datetime_now().strftime('%Y%m%d_%H%M'))
-    return send_as_file(out,name=name,ext='csv')
     
 def send_as_file(out,name='report',ext='csv'):
     #send the report

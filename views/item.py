@@ -8,8 +8,11 @@ from .item_reports import stock_on_hand_report
 from inventory.views.transaction import get_trx_list_for_item
 from inventory.views.transfer import get_transfer_list_for_item 
 
+PRIMARY_TABLE = Item
+
 mod = Blueprint('item',__name__, template_folder='templates/inventory', static_folder='static/inventory', url_prefix='/items')
 
+from shotglass2.takeabeltof.views import TableView
 
 def setExits():
     g.listURL = url_for('item.display')
@@ -19,14 +22,35 @@ def setExits():
     g.stock_reportURL = url_for('item.stock_report')
     #g.trxListFromItemURL = url_for('item.transaction_list_for_item')
 
-@mod.route('/',methods=["GET",])
-@table_access_required(Item)
-def display():
+# this handles table list and record delete
+@mod.route('/<path:path>',methods=['GET','POST',])
+@mod.route('/<path:path>/',methods=['GET','POST',])
+@mod.route('/',methods=['GET','POST',])
+@table_access_required(PRIMARY_TABLE)
+def display(path=None):
     setExits()
     g.title = "{} List".format(g.title)
-    recs = Item(g.db).select()
+
+    view = TableView(PRIMARY_TABLE,g.db)
+
+    view.list_fields = [
+        {'name':'id','label':'ID','class':'w3-hide-medium w3-hide-small','search':True,},
+        {'name':'name',},
+        {'name':'uom',},
+        {'name':'category',},
+        {'name':'lifo_cost','type':'real'},
+        {'name':'soh','label':'On Hand','type':'int'},
+    ]
+    view.export_fields = [
+        {'name':'id','label':'ID','class':'w3-hide-medium w3-hide-small','search':True,},
+        {'name':'name',},
+        {'name':'uom',},
+        {'name':'category',},
+        {'name':'lifo_cost','type':'money'},
+        {'name':'soh','label':'On Hand',},
+    ]
     
-    return render_template('item_list.html',recs=recs)
+    return view.dispatch_request()
     
     
 @mod.route('/edit',methods=["GET", "POST",])
