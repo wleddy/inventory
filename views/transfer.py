@@ -320,7 +320,9 @@ def validate_form(rec):
 
             
     # test for valid date
-    test_date = getDatetimeFromString(rec.transfer_date)
+    test_date = rec.transfer_date
+    if isinstance(test_date,str):
+        test_date = getDatetimeFromString(rec.transfer_date)
     if not test_date:
         flash("There must be transfer date")
         valid_form = False
