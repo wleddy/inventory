@@ -49,6 +49,10 @@ def stock_on_hand_report(start_date=None,end_date=None,warehouse=-1):
         local_date_string(end_date),
         excel_date_and_time_string(local_datetime_now()),
     )
+    view.export_file_name = "{} stock report {}.csv".format(
+        warehouse_name,
+        str(local_datetime_now())[:19],
+    ).replace(' ','_').lower()
         
                 
     view.sql = """SELECT 
