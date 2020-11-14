@@ -49,7 +49,7 @@ class Item(SqliteTable):
                     from item
                     left join trx on trx.item_id = item.id
                     left join warehouse as wares on wares.id = trx.warehouse_id
-                    join category as cats on cats.id = item.cat_id
+                    left join category as cats on cats.id = item.cat_id
             
                     where {where} 
                     group by item.id
