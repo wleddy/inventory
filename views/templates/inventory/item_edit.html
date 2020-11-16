@@ -3,37 +3,34 @@
 {% from "_form_helpers.html" import input_field, select_field, radio_field, checkbox_field, label_only %}
 
 {% block fieldset %}
-<!-- <h4 class="w3-panel w3-primary-color" id="item-QOH">Quantity On Hand: <span id="item-QOH-value" >{{on_hand | default("0", True) }}</span></span></h4> -->
-<div class="w3-contain">
-    <fieldset class="w3-col s12 m6 l6 w3-left">
-        <p>{{ input_field(rec.id,"id",type="hidden",default=0)}}</p>
-        <p>{{ input_field(rec.name,"name",req=True)}}</p>
-        <p>{{ input_field(rec.description,"description")}}</p>
-        <p>{{ select_field("cat_id","Category", req=True) }}
+<fieldset>
+    <p>{{ input_field(rec.id,"id",type="hidden",default=0)}}</p>
+    <div class="w3-col w3-third">
+        <p class="w3-row" >{{ input_field(rec.name,"name",req=True)}}</p>
+        <p class="w3-row " >{{ select_field("cat_id","Category", req=True) }}
                 <option value="0" ><em>Select One...</em></option>
                 {% for category in categories %}
                 <option value="{{ category.id }}" {% if rec.cat_id | int == category.id %}selected{% endif %} >{{ category.name}}</option>
                 {% endfor %}
             </select>
         </p>
-        <p>{{ select_field("uom","Unit of Measure") }}
+    </div>
+    <div class="w3-col w3-third">
+        <p class="w3-row">{{ select_field("uom","Unit of Measure") }}
                     <option value="" ><em>None</em></option>
                     {% for uom in uoms %}
                     <option value="{{ uom.name }}" {% if rec.uom == uom.name %}selected{% endif %} >{{ uom.name}}</option>
                     {% endfor %}
             </select>
         </p>
-        <p>{{ input_field(rec.min_stock,'min_stock',label="Minimum Stock")}}</p>
-        </p>
+        <p class="w3-row">{{ input_field(rec.min_stock,'min_stock',label="Minimum Stock")}}</p>
     
-    </fieldset>
-</div>
-
-<div class="w3-col w3-hide-small w3-left" style='width:4%'>&nbsp;</div>
+    </div>
+    <p class="w3-row w3-twothird" >{{ input_field(rec.description,"description")}}</p>
 <div  id="transactions_and_transfers">
     {% include "trx_and_transfer_lists.html" %}
 </div>
+</fieldset>
 
-
-<div w3-panel>&nbsp;</div>
+<!-- <div w3-panel>&nbsp;</div> -->
 {% endblock fieldset %}
