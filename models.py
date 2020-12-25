@@ -36,13 +36,12 @@ class Item(SqliteTable):
                     COALESCE (
                         (select trx.value from trx 
                             where trx.item_id = item.id  
-                            and trx.value > 0 and {where} order by trx.created desc limit 1
+                            and trx.value > 0 order by trx.created desc limit 1
                         )
                     ,0) as lifo_cost,
                     COALESCE (
                         (select sum(trx.qty) from trx 
                             where trx.item_id = item.id  
-                            and {where}
                         )
                     ,0) as soh
             
@@ -57,7 +56,6 @@ class Item(SqliteTable):
             """.format(
                 where=where,
                 )
-        
         return self.query(sql)
 
     # def _select_sql(self,**kwargs):

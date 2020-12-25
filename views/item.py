@@ -38,8 +38,8 @@ def display(path=None):
         {'name':'name',},
         {'name':'uom',},
         {'name':'category',},
-        {'name':'lifo_cost','type':'real'},
-        {'name':'soh','label':'On Hand','type':'int'},
+        {'name':'lifo_cost','type':'real', 'search':False,},
+        {'name':'soh','label':'On Hand','type':'int','search':False,},
     ]
     view.export_fields = [
         {'name':'id','label':'ID','class':'w3-hide-medium w3-hide-small','search':True,},
