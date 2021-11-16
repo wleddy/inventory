@@ -33,7 +33,6 @@
                 {% endfor %}
         </select>
     </p>
-    <p><span>Qty:</span><input type="num" size="5" name="qty" required value="{{ rec.qty |default(0,True ) | abs }}" /></p>
     <div id="normal-warehouse">
         <p>
             {{ select_field("warehouse_id","Warehouse") }}
@@ -43,6 +42,7 @@
             </select>
         </p>
     </div>
+    <p><span>Qty:</span><input type="num" size="5" name="qty" required value="{{ rec.qty |default(0,True ) | abs }}" /></p>
 </div>
     <p><span>Value:</span>
         <input type="num" size="5" name="value" value="{{ rec.value|default('0',True )|money}}" />
