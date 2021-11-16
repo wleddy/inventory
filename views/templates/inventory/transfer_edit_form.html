@@ -1,13 +1,20 @@
 {# Form body for transaction editing #}
 {% from "_form_helpers.html" import input_field, select_field, radio_field, checkbox_field, label_only %}
 
+{% include "anytime_head.html"%}
+
 <fieldset>
 	<input type=hidden name="id" value="{{rec.id|default('0',True )}}">
 	<input type=hidden name="item_id" value="{{rec.item_id|default('0',True )}}">
     <h3 class="w3-container w3-panel w3-primary-color">Transfer {{item.name}}</h3>
     <div class="w3-row">
         {% set transfer_date = rec.transfer_date | local_date_string %}
-        <p class="w3-col w3-half">{{ input_field(transfer_date,'transfer_date',placeholder='MM/DD/YY')}}</p>
+        <p class="w3-col w3-half">{{ input_field(transfer_date,'transfer_date',
+            id='transfer_date',
+            placeholder='MM/DD/YY',
+            extras='onfocus="set_date_pickers(\'%c/%e/%y\')"',
+            )}}
+        </p>
         <p class="w3-col w3-half" style="padding-left:3pt;">{{ input_field(rec.qty,'qty',default='0')}}</p>
     </div>
     <div id="normal-warehouse">
@@ -32,3 +39,16 @@
     </div>
 </div>
 </fieldset>
+
+<script>
+    // setup the date picker
+    var date_format = "%c/%e/%y"; // "3/4/19"
+    var pickers = ["#transfer_date"]
+    
+    function set_date_pickers(format){
+        for( i = 0;i<pickers.length;i++){
+            $(pickers[i]).AnyTime_noPicker().AnyTime_picker({ format: format } );                
+        }
+    }
+    set_date_pickers(date_format);
+</script>

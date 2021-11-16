@@ -1,6 +1,18 @@
 {# Form body for transaction editing #}
 {% from "_form_helpers.html" import input_field, select_field, radio_field, checkbox_field, label_only %}
 
+{% include "anytime_head.html"%}
+<script>
+    // setup the date picker 
+    function set_date_pickers(){
+        var pickers = ["#created"]
+        for( i = 0;i<pickers.length;i++){
+            $(pickers[i]).AnyTime_noPicker().AnyTime_picker({ format: "%c/%e/%y" } );                
+        }
+    }
+    $(document).ready(function(){set_date_pickers();});
+</script>
+
 	<input type=hidden name="id" value="{{rec.id|default('0',True )}}">
     {% if items and not current_item %}
     <select name="item_id">
@@ -36,6 +48,6 @@
         <input type="num" size="5" name="value" value="{{ rec.value|default('0',True )|money}}" />
         {%if current_item.uom %}(per {{ current_item.uom }}){% endif %}
     </p>
-    <p><span>Date: </span><input type="date" size="20" required name="created" value="{{ rec.created|default('',True )|short_date_string}}" /></p>
+    <p><span>Date: </span><input type="text" size="20" required name="created" id="created" value="{{ rec.created|default('',True )|short_date_string}}" onclock="set_date_pickers('%c/%e/%y')" /></p>
     <p><span>Note: </span><input type="text" size="40" name="note"  value="{{ rec.note|default('',True)}}" /></p>
 </fieldset>
