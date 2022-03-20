@@ -1,5 +1,11 @@
 {% extends "layout.html" %}
+
 {% block title %}{{ g.title }} List{% endblock %}
+{% block head %}
+{{ super() }}
+{% include "anytime_head.html"%}
+
+{% endblock head%}
 {% block body %}
     <div class="w3-col m3 l3 w3-hide-small">&nbsp;</div>
     <div  id="item_report_form" class="w3-col s12 m6 l6">
@@ -15,10 +21,23 @@
                         {% endif %}
                     </select>
                 </p>
-                <p><span style="font-weight:800;" >Report Start Date: </span><input type="date" size="30" name="start_date" required value="{{ start_date | iso_date_string }}" /></p>
-                <p><span style="font-weight:800;" >Report End Date: &nbsp;&nbsp;</span><input type="date" size="30" name="end_date" value="{{ end_date | iso_date_string }}" /></p>
+                <p><span style="font-weight:800;" >Report Start Date: </span><input type="text" size="30" name="start_date" id="start_date" required value="{{ start_date | local_date_string }}" /></p>
+                <p><span style="font-weight:800;" >Report End Date: &nbsp;&nbsp;</span><input type="text" size="30" name="end_date" id="end_date"  value="{{ end_date | local_date_string }}" /></p>
                 <p><input class="w3-btn w3-ripple w3-primary-color w3-mobile w3-round-large w3-shadow" type="submit" name="submit" value="Report">&nbsp;&nbsp;<a href="{{ g.listURL }}">Done</a></p>
             </fieldset>
         </form>
     </div>
+
+<script>
+    // setup the date picker
+    var date_format = "%c/%e/%y"; // "3/4/19"
+    var pickers = ["#start_date", "#end_date"]
+
+    function set_date_pickers(format){
+        for( i = 0;i<pickers.length;i++){
+            $(pickers[i]).AnyTime_noPicker().AnyTime_picker({ format: format } );
+        }
+    }
+    set_date_pickers(date_format);
+</script>
 {% endblock %}
