@@ -2,6 +2,12 @@
 
 {% from "_form_helpers.html" import input_field, select_field, radio_field, checkbox_field, label_only %}
 
+
+{% block head %}
+{{ super() }}
+{% include "anytime_head.html"%}
+{% endblock head%}
+
 {% block fieldset %}
 <fieldset>
     <p>{{ input_field(rec.id,"id",type="hidden",default=0)}}</p>

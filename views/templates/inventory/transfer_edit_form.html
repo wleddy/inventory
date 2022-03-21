@@ -1,7 +1,6 @@
 {# Form body for transaction editing #}
 {% from "_form_helpers.html" import input_field, select_field, radio_field, checkbox_field, label_only %}
 
-{% include "anytime_head.html"%}
 
 <fieldset>
 	<input type=hidden name="id" value="{{rec.id|default('0',True )}}">
