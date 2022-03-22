@@ -39,7 +39,7 @@ def display(path=None):
         {'name':'uom',},
         {'name':'category',},
         {'name':'lifo_cost','type':'real', 'search':False,},
-        {'name':'soh','label':'On Hand','type':'int','search':False,},
+        {'name':'soh','label':'On Hand','type':'int','search':False,"default":0},
     ]
     view.export_fields = [
         {'name':'id','label':'ID','class':'w3-hide-medium w3-hide-small','search':True,},
