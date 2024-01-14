@@ -27,9 +27,12 @@ class Item(SqliteTable):
         super().create_table(sql)
         
         
-    def select(self,where=None,order_by=None):
+    def select(self,where=None,order_by=None,**kwargs):
         where = where if where else '1'
         order_by = order_by if order_by else self.order_by_col
+        limit = kwargs.get('limit',99999)
+        offset = kwargs.get('offset',1)
+
         sql = """SELECT 
                     item.*, 
                     cats.name as category,
@@ -53,33 +56,14 @@ class Item(SqliteTable):
                     where {where} 
                     group by item.id
                     order by lower(category), lower(item.name)
+                    limit {limit}
+                    offset {offset}
             """.format(
                 where=where,
+                limit=limit,
+                offset=offset,
                 )
         return self.query(sql)
-
-    # def _select_sql(self,**kwargs):
-    #     """Return the sql text that will be used by select or select_one
-    #     optional kwargs are:
-    #         where: text to use in the where clause
-    #         order_by: text to include in the order by clause
-    #
-    #         This version deals with the category.name, item.name sorting that I
-    #         want to do most of the time
-    #
-    #         provide a where or order_by kwarg to use standard method instead
-    #
-    #     """
-    #     where = kwargs.get('where',None)
-    #     order_by = kwargs.get('order_by',None)
-    #     if order_by == None and where == None:
-    #         # do the related order by
-    #         sql = 'SELECT item.* FROM {} '.format(self.table_name)
-    #         sql += 'JOIN category on item.cat_id = category.id '
-    #         sql += 'ORDER BY category.name, item.name'
-    #         return sql
-    #     # else do a normal select
-    #     return super()._select_sql(**kwargs)
 
 
     def _get_warehouse_where(self,**kwargs):
