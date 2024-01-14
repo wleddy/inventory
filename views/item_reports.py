@@ -2,7 +2,7 @@
 
 from inventory.models import Item, Category, Transaction, Warehouse
 from flask import Response,g
-from shotglass2.shotglass import get_app_config
+from shotglass2.shotglass import get_site_config
 from shotglass2.takeabeltof.date_utils import local_datetime_now
 from shotglass2.takeabeltof.jinja_filters import iso_date_string, excel_date_and_time_string, local_date_string
 from shotglass2.takeabeltof.utils import cleanRecordID
