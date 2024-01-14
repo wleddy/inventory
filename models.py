@@ -330,14 +330,14 @@ class Warehouse(SqliteTable):
         self.create_table()
             
 
-def init_tables(db):
-    Item(db).init_table()
-    Category(db).init_table()
-    Item(db).init_table()
-    Uom(db).init_table()
-    Transaction(db).init_table()
-    Warehouse(db).init_table()
-    Transfer(db).init_table()
-    #TransferItem(db).init_table()
+def init_db(db):
+    """Create Tables."""
+    l = globals().copy()
+    for n,o in l.items():
+        if type(o) == type and \
+            issubclass(o,SqliteTable) and \
+            o != SqliteTable:
+    
+            o(db).init_table()
     
     
