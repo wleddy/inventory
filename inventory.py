@@ -1,14 +1,14 @@
 from flask import g, url_for, abort
 from shotglass2.takeabeltof.utils import printException
 from inventory.utils import register_inv_filters
-from inventory.models import init_tables, Item,Category,Uom,Transaction, Warehouse, Transfer
+from inventory.models import init_db, Item,Category,Uom,Transaction, Warehouse, Transfer
 from inventory.views import item, category, uom, transaction, warehouse, transfer
 
 def register_jinja_filters(app):
     register_inv_filters(app)
 
 def initalize_tables(db):
-    init_tables(db)
+    init_db(db)
     
 def register_admin():
     
