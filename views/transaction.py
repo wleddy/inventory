@@ -207,7 +207,7 @@ def save_record(rec,err_list=[]):
         try:
             g.db.commit()
             #Save the date and comment to session
-            session['last_trx'] = {"created":rec.created,"note":rec.note}
+            session['last_trx'] = {"created":rec.created,"note":rec.note,"warehouse_id":rec.warehouse_id}
             return True
             
         except Exception as e:
