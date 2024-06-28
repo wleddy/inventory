@@ -10,7 +10,7 @@ def register_jinja_filters(app):
 def initalize_tables(db):
     init_db(db)
     
-def register_admin():
+def create_menus():
     
     try:
         g.admin.register(Item,None,display_name='Inv Admin',header_row=True,minimum_rank_required=500)
